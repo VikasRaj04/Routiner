@@ -29,6 +29,6 @@ Ensure you have Node.js and npm installed on your local machine. You will also n
 ### Steps to Run Locally
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/routiner.git
+   git clone https://github.com/VikasRaj04/routiner.git
    cd routiner
 >>>>>>> c4ea129 (Routiner Project Published)
