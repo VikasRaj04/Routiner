@@ -1,0 +1,38 @@
+.dashboard-main {
+    width: calc(100vw - 250px);
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px;
+    margin: 10px;
+    border-radius: 8px;
+    background: linear-gradient(270deg, #ebebeb 0%, #6b73ff 0%, #000dff 100%);
+    /* background-image: url(../../images/background-with-girl.png); */
+    /* background-repeat: no-repeat; */
+    /* background-position: center center; */
+    /* background-size: cover; */
+    color: white;
+    overflow: hidden;
+    mix-blend-mode: multiply;
+}
+
+.dashboard-header .header-content{
+    display: flex;
+    gap: 4px 0;
+    flex-direction: column;
+}
+
+.dashboard-header .header-content h2{
+    font-size: 1.6rem;
+    font-weight: 500;
+}
+
+.dashboard-header .header-content p{
+    font-size: 0.9rem;
+}

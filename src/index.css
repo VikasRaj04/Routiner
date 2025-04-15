@@ -1,0 +1,6 @@
+:root {
+  --primary-blue-100: #3843FF;
+  --primary-blue-80: #6069FF;
+  --primary-blue-active: #2a36e6;
+  --background: linear-gradient(90deg, rgba(235, 235, 235, 1) 0%, rgba(107, 115, 255, 1) 0%, rgba(0, 13, 255, 1) 100%);
+}

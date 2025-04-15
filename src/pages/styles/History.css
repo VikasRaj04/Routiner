@@ -1,0 +1,339 @@
+/* 🔹 Page Layout */
+.history-page {
+    width: 100%;
+    display: flex;
+    background-color: #f4f7fc;
+    /* Light Background for Clean Look */
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 233px;
+}
+
+.history-content {
+    flex: 1;
+    padding: 40px;
+    /* max-width: 900px; */
+    max-width: calc(100% - 233px);
+    margin: auto;
+}
+
+/* 🔹 Title */
+.history-title {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: var(--primary-blue-100);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+
+.history-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.history-tab {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 8px;
+    background: #f1f1f1;
+    transition: all 0.3s ease;
+}
+
+.history-tab:hover {
+    background: #e0e0e0;
+}
+
+.history-tab.active {
+    background: #3843FF;
+    /* Primary Blue */
+    color: white;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
+/* 🔹 Status Messages */
+.history-loading,
+.history-error,
+.history-empty {
+    text-align: center;
+    font-size: 1.3rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* 🔹 History Section */
+.history-section {
+    margin-bottom: 35px;
+    padding: 20px;
+    border-radius: 12px;
+    background: white;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 🔹 Date Title */
+.history-date {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #3843FF;
+    margin-bottom: 15px;
+    border-bottom: 3px solid #3843FF;
+    padding-bottom: 5px;
+}
+
+/* 🔹 History Card */
+.history-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin: 7px 0;
+    background: #fff;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* 🔹 Hover Effect */
+.history-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* 🔹 Text Layout */
+.history-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 🔹 Habit Name */
+.habit-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #222;
+}
+
+/* 🔹 Timestamp */
+.history-time {
+    font-size: 1rem;
+    color: #555;
+    font-weight: 500;
+}
+
+/* 🔹 Action Colors */
+.history-action {
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-transform: capitalize;
+}
+
+/* 🔹 Different Colors for Actions */
+.history-card.created {
+    border-left: 6px solid #28a745;
+    background-color: rgba(40, 167, 69, 0.08);
+}
+
+.history-card.updated {
+    border-left: 6px solid #ffc107;
+    background-color: rgba(255, 193, 7, 0.08);
+}
+
+.history-card.deleted {
+    border-left: 6px solid #dc3545;
+    background-color: rgba(220, 53, 69, 0.08);
+    text-decoration: line-through;
+    color: #dc3545;
+}
+
+
+
+
+/* Streakly */
+.streak-section {
+    padding: 20px;
+}
+
+/* 🟢 Grid Layout - Equal Column Distribution */
+.streak-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+/* 📦 Box Design */
+.streak-box {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.streak-box:hover {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 🏆 Title/Header */
+.streak-header {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #3843FF;
+    padding-bottom: 5px;
+}
+
+/* 📋 List Styling */
+.streak-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* ✅ Streak Item */
+.streak-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    transition: background 0.2s ease;
+}
+
+.streak-item:hover {
+    background: #f0f0f0;
+}
+
+/* 🏷 Habit Name */
+.streak-name {
+    font-weight: 500;
+    color: #444;
+}
+
+/* 📅 Date */
+.streak-date {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* ❌ No Data */
+.no-data {
+    text-align: center;
+    color: #999;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 20px;
+    background: #f5f5f5;
+    border-radius: 6px;
+}
+
+
+
+
+/* LifeTime History */
+
+.lifetime-history-container {
+    padding: 24px;
+}
+
+.loading-text,
+.error-text {
+    font-size: 16px;
+    color: #555;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.lifetime-history-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+
+.back-button {
+    background: #3843FF;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-bottom: 12px;
+}
+
+.selected-month-title {
+    text-align: center;
+    margin-bottom: 6px;
+    font-size: 1.1rem;
+}
+
+.history-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 300px);
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.history-card {
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    min-width: 220px;
+    text-align: center;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.history-habit-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.history-action {
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 4px;
+}
+
+.history-date {
+    font-size: 12px;
+    color: #666;
+}
+
+
+/* Lifetime Card */
+
+.lifetime-card {
+    background-color: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    text-align: center;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.lifetime-card:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.lifetime-card-title {
+    font-size: 18px;
+    font-weight: 600;
+}

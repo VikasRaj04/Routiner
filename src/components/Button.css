@@ -1,0 +1,61 @@
+@import '../index.css';
+
+.btn {
+  padding: 12px 20px;
+  margin: 4px;
+  font-size: 16px;
+  width: auto;
+  height: auto;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: black;
+  border-radius: 40px;
+  transition: background-color 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  font-weight: 400;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn:focus {
+  outline: none;
+}
+
+.t-uppercase{
+  text-transform: uppercase;
+}
+
+
+/* buttons styles*/
+
+.white-btn{
+  color: black;
+  background: white;
+}
+
+.white-btn:hover{
+  background-color: transparent;
+  border: 1.5px solid white;
+  color: white;
+}
+
+.white-btn:active{
+  background-color: var(--primary-blue-100);
+  border: none;
+  transition: all 0.3s;
+}
+
+.hero-btn-main{
+  width: 100%;
+  margin: 12px 0;
+  padding: 16px;
+}
+
+.social-btn{
+  width: calc(100% / 2); 
+  font-size: 15px;
+  border-radius: 25px;
+}
