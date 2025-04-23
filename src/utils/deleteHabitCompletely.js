@@ -1,5 +1,12 @@
-import { doc, deleteDoc, collection, getDocs, writeBatch, setDoc } from "firebase/firestore";
-import { db } from '../firebase/firebase';
+import {
+  doc,
+  deleteDoc,
+  collection,
+  getDocs,
+  writeBatch,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "../firebase/firebase";
 import { addHistoryEntry } from "../firebase/firebaseService";
 import { removeHabit } from "../store/slices/habitSlice";
 
@@ -9,17 +16,16 @@ export const deleteHabitCompletely = async (userID, habitID, habitName, dispatch
     const isAnonymous = userID === storedUID;
 
     if (isAnonymous) {
-      // 🔥 Anonymous user: LocalStorage se remove karo
-      let storedHabits = JSON.parse(localStorage.getItem("anonymousHabits")) || [];
+      // 🔥 Anonymous user: Delete from localStorage
+      const storedHabits = JSON.parse(localStorage.getItem("anonymousHabits")) || [];
       const updatedHabits = storedHabits.filter(habit => habit.id !== habitID);
       localStorage.setItem("anonymousHabits", JSON.stringify(updatedHabits));
 
-      console.log(`Anonymous habit deleted: ${habitName}`);
+      console.log(`🗑️ Deleted anonymous habit: ${habitName}`);
     } else {
       const habitRef = doc(db, "users", userID, "habits", habitID);
       const progressRef = collection(db, "users", userID, "progress");
 
-      // 🔍 Fetch all progress linked to this habit
       const progressSnapshot = await getDocs(progressRef);
       const batch = writeBatch(db);
       const deletedProgress = [];
@@ -32,32 +38,28 @@ export const deleteHabitCompletely = async (userID, habitID, habitName, dispatch
         }
       });
 
-      // 🗃️ Archive deleted habit + progress
-      const archiveRef = doc(db, "users", userID, "deletedData", habitID);
-      await setDoc(archiveRef, {
+      // 📦 Archive deleted habit + its progress
+      await setDoc(doc(db, "users", userID, "deletedData", habitID), {
         habitId: habitID,
         deletedAt: new Date().toISOString(),
         progress: deletedProgress,
       });
 
-      // ✅ Commit batched progress deletes
-      await batch.commit();
-
-      // ✅ Now delete habit document
-      await deleteDoc(habitRef);
+      await batch.commit();        // 🚮 Delete all related progress
+      await deleteDoc(habitRef);   // 🗑️ Delete the habit document
 
       console.log(`✅ Deleted habit "${habitName}" and related progress`);
     }
 
-    // 🔄 Update Redux Store
+    // 🔄 Update Redux
     dispatch(removeHabit({ userID, habitID, habitName }));
 
-    // 🕘 History Entry
+    // 🕘 Log to history
     await addHistoryEntry(userID, "deleted", habitID, habitName);
 
     return true;
   } catch (error) {
-    console.error("❌ Error in deleteHabitCompletely:", error);
+    console.error("❌ Failed to delete habit:", error.message);
     return false;
   }
 };

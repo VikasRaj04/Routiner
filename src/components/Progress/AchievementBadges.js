@@ -1,6 +1,4 @@
-// components/Progress/AchievementBadges.js
-
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
@@ -11,12 +9,15 @@ const AchievementBadges = () => {
     const [loading, setLoading] = useState(true);
     const [showAll, setShowAll] = useState(false);
 
-    const VISIBLE_LIMIT = 15; // Show 9 badges by default
+    const VISIBLE_LIMIT = 15;
+
+    // Use useCallback to memoize setShowAll function
+    const toggleShowAll = useCallback(() => setShowAll(prev => !prev), []);
 
     useEffect(() => {
         const fetchBadges = async () => {
             if (!user?.userId) {
-                setBadges([]);
+                setBadges([]);  // If no userId, clear badges
                 setLoading(false);
                 return;
             }
@@ -33,6 +34,7 @@ const AchievementBadges = () => {
                 setBadges(badgeList);
             } catch (error) {
                 console.error("Error fetching badges:", error);
+                setBadges([]);
             } finally {
                 setLoading(false);
             }
@@ -59,33 +61,26 @@ const AchievementBadges = () => {
     return (
         <div className="badges-container">
             <h2> 🏆 Achievements & Badges</h2>
-
-            {badges.length === 0 ? (
-                <h2 className="no-badges-heading">No Badges Yet 🧭</h2>
-            ) : (
-                <>
-                    <div className="badges-grid">
-                        {visibleBadges.map((badge) => (
-                            <div key={badge.id} className="badge-card">
-                                <h3 className="badge-title">
-                                    {badge.emoji || '🎖️'} {badge.name}
-                                </h3>
-                                <p className="badge-type">{badge.type || 'Achievement'}</p>
-                            </div>
-                        ))}
+            <div className="badges-grid">
+                {visibleBadges.map((badge) => (
+                    <div key={badge.id} className="badge-card">
+                        <h3 className="badge-title">
+                            {badge.emoji || '🎖️'} {badge.name}
+                        </h3>
+                        <p className="badge-type">{badge.type || 'Achievement'}</p>
                     </div>
+                ))}
+            </div>
 
-                    {badges.length > VISIBLE_LIMIT && (
-                        <div className="show-more-container">
-                            <button
-                                className="show-more-btn"
-                                onClick={() => setShowAll(!showAll)}
-                            >
-                                {showAll ? 'Show Less ▲' : 'Show More ▼'}
-                            </button>
-                        </div>
-                    )}
-                </>
+            {badges.length > VISIBLE_LIMIT && (
+                <div className="show-more-container">
+                    <button
+                        className="show-more-btn"
+                        onClick={toggleShowAll}
+                    >
+                        {showAll ? 'Show Less ▲' : 'Show More ▼'}
+                    </button>
+                </div>
             )}
         </div>
     );

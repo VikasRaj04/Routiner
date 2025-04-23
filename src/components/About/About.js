@@ -1,25 +1,28 @@
-import React from 'react';
-import './About.css';
-import ShortStory from './ShortStory';
-import AboutIllustration from '../../images/AboutIllust1.webp'
-import KeyFeatures from './KeyFeatures';
+import React, { Suspense, lazy } from 'react';
+// import './About.css';
+
+// Optimized image import at the top as well
+import AboutIllustration from '../../images/AboutIllust1.webp';
+
+// Lazy-loaded components at the top for correct import order
+const ShortStory = lazy(() => import('./ShortStory'));
+const KeyFeatures = lazy(() => import('./KeyFeatures'));
 
 const About = () => {
     return (
-        <section className="about-section">
+        <section className="about-section" id='about'>
             <div className="about-content">
-
                 <div className="left">
                     <div className="about-graphics">
-                        <img src={AboutIllustration} alt="Illustration" />
+                        <img src={AboutIllustration} alt="Illustration showcasing Routiner app features" />
                     </div>
 
                     <div className="left-text-container">
                         <div className="left-text">
-
-
                             <article className="story">
-                                <ShortStory />
+                                <Suspense fallback={<div>Loading story...</div>}>
+                                    <ShortStory />
+                                </Suspense>
                             </article>
                         </div>
                     </div>
@@ -40,7 +43,9 @@ const About = () => {
                         </p>
                     </div>
 
-                    <KeyFeatures />
+                    <Suspense fallback={<div>Loading Key Features...</div>}>
+                        <KeyFeatures />
+                    </Suspense>
 
                     <div className="why-choose-us">
                         <h3>Why Choose Us?</h3>
@@ -63,7 +68,6 @@ const About = () => {
                         </ul>
                     </div>
                 </div>
-
             </div>
         </section>
     );

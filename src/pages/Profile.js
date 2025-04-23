@@ -3,13 +3,14 @@ import { auth, db } from "../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { Button, Navbar } from "../components";
 import { useNavigate } from "react-router-dom";
+
 import "./styles/Profile.css";
 import defaultAvatar from "../images/AboutIllust1.webp";
+import getFirebaseErrorMessage from "../firebase/firebaseErrors";
 
 function Profile() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [status, setStatus] = useState({ loading: true, error: null });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,32 +19,31 @@ function Profile() {
         const currentUser = auth.currentUser;
 
         if (!currentUser) {
-          setError("User not logged in.");
-          setLoading(false);
+          setStatus({ loading: false, error: "User not logged in." });
           return;
         }
 
-        let userData = {
-          name: currentUser.displayName || "Anonymous User",
-          email: currentUser.email,
-          birth: currentUser.birth || "Not Provided", // Handle missing birth date
-          uid: currentUser.uid,
-          photoURL: currentUser.photoURL,
-        };
-
         const userDocRef = doc(db, "users", currentUser.uid);
         const userDoc = await getDoc(userDocRef);
+        const userData = userDoc.exists() ? userDoc.data() : {};
 
-        if (userDoc.exists()) {
-          userData = { ...userData, ...userDoc.data() };
-        }
+        setUser({
+          name: currentUser.displayName || userData.name || "Anonymous User",
+          email: currentUser.email,
+          uid: currentUser.uid,
+          photoURL: currentUser.photoURL || "",
+          customId: userData.customId || "Not Set",
+          birth: userData.birth || "Not Provided",
+          gender: userData.gender || "Not Provided",
+        });
 
-        setUser(userData);
-      } catch (fetchError) {
-        console.error("Error fetching user data:", fetchError);
-        setError("Failed to fetch user data. Please try again later.");
-      } finally {
-        setLoading(false);
+        setStatus({ loading: false, error: null });
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        setStatus({
+          loading: false,
+          error: getFirebaseErrorMessage(error),
+        });
       }
     };
 
@@ -54,67 +54,63 @@ function Profile() {
     try {
       await auth.signOut();
       alert("Logged out successfully!");
-      navigate("/"); // Redirect to home after logout
+      navigate("/");
     } catch (error) {
-      console.error("Logout failed:", error.message);
-      alert("Error during logout. Please try again.");
+      console.error("Logout failed:", error);
+      alert(getFirebaseErrorMessage(error));
     }
   };
 
-  if (loading) {
-    return <p className="loading">Loading profile...</p>; // Add more specific loading indicator
-  }
-
-  if (error) {
-    return (
-      <div className="profile-container error">
-        <h2>Error</h2>
-        <p>{error}</p>
-        <Button onClick={() => navigate("/login")}>Log In</Button>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return (
-      <div className="profile-container">
-        <h2>Not Logged In</h2>
-        <p>Please log in or sign up to access full features.</p>
-        <Button onClick={() => navigate("/login")}>Log In</Button>
-        <Button onClick={() => navigate("/signup")}>Sign Up</Button>
-      </div>
-    );
-  }
+  const { loading, error } = status;
 
   return (
     <>
       <Navbar />
       <div className="profile-container">
-        <div className="profile-header">
-          <img
-            src={user.photoURL || defaultAvatar}
-            alt="Profile"
-            className="profile-avatar"
-          />
-          <h1 className="user-name">{user.name}</h1>
-          <p className="email">{user.email}</p>
-        </div>
+        {loading ? (
+          <p className="loading">Loading profile...</p>
+        ) : error ? (
+          <div className="error">
+            <h2>Error</h2>
+            <p>{error}</p>
+            <Button onClick={() => navigate("/login")}>Log In</Button>
+          </div>
+        ) : !user ? (
+          <div>
+            <h2>Not Logged In</h2>
+            <p>Please log in or sign up to access full features.</p>
+            <Button onClick={() => navigate("/login")}>Log In</Button>
+            <Button onClick={() => navigate("/signup")}>Sign Up</Button>
+          </div>
+        ) : (
+          <>
+            <div className="profile-header">
+              <img
+                src={user.photoURL || defaultAvatar}
+                alt="Profile"
+                className="profile-avatar"
+              />
+              <h1 className="user-name">{user.name}</h1>
+              <p className="email">{user.email}</p>
+            </div>
 
-        <div className="profile-info">
-          <div className="info-item">
-            <strong>UID:</strong> {user.customId || "Not Set"}
-          </div>
-          <div className="info-item">
-            <strong>Date of Birth:</strong> {user.birth}
-          </div>
-          <div className="info-item">
-            <strong>Gender:</strong> {user.gender || "Not Provided"}
-          </div>
-        </div>
+            <div className="profile-info">
+              <div className="info-item">
+                <strong>UID:</strong> {user.customId}
+              </div>
+              <div className="info-item">
+                <strong>Date of Birth:</strong> {user.birth}
+              </div>
+              <div className="info-item">
+                <strong>Gender:</strong> {user.gender}
+              </div>
+            </div>
 
-        <Button onClick={handleLogout} className="logout-btn">
-          Log Out
-        </Button>
+            <Button onClick={handleLogout} className="logout-btn">
+              Log Out
+            </Button>
+          </>
+        )}
       </div>
     </>
   );

@@ -1,57 +1,61 @@
-import React from 'react';
-import './Habit.css';
-import Button from '../Button';
+import React from "react";
+import "./Habit.css";
+import Button from "../Button";
 
 function HabitForm({
   closeModal,
   handleSubmit,
-  habitName,
+  habitName = "",
   setHabitName,
-  description,
+  description = "",
   setDescription,
-  category,
+  category = "",
   setCategory,
-  frequency,
+  frequency = "1/1",
   setFrequency,
-  startDate,
+  startDate = "",
   setStartDate,
-  markDate,
+  markDate = "",
   setMarkDate,
-  action = 'Add Habit'
+  action = "Add Habit",
 }) {
   return (
     <div className="modal-overlay" onClick={closeModal}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>Add New Habit</h2>
+        <h2>{action}</h2>
 
-        <div className="close-btn" onClick={closeModal} aria-label="Close">
+        <button className="close-btn" onClick={closeModal} aria-label="Close Modal">
           &times;
-        </div>
+        </button>
 
         <form onSubmit={handleSubmit}>
-          <label>Habit Name:</label>
+          <label htmlFor="habitName">Habit Name:</label>
           <input
+            id="habitName"
             type="text"
             value={habitName}
             onChange={(e) => setHabitName(e.target.value)}
             required
           />
 
-          <label>Description:</label>
+          <label htmlFor="description">Description:</label>
           <textarea
+            id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-          ></textarea>
+          />
 
-          <label>Category:</label>
+          <label htmlFor="category">Category:</label>
           <input
+            id="category"
             type="text"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           />
 
-          <label>Frequency:</label>
+          <label htmlFor="frequency">Frequency:</label>
           <select
+            id="frequency"
             value={frequency}
             onChange={(e) => setFrequency(e.target.value)}
           >
@@ -61,17 +65,17 @@ function HabitForm({
             <option value="1/7">Weekly</option>
           </select>
 
-          {/* Start Date (for future habit scheduling) */}
-          <label>Start Date:</label>
+          <label htmlFor="startDate">Start Date:</label>
           <input
+            id="startDate"
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
 
-          {/* Mark Date (for special calendar dates) */}
-          <label>Mark Special Date (e.g. birthday):</label>
+          <label htmlFor="markDate">Mark Special Date (e.g. birthday):</label>
           <input
+            id="markDate"
             type="date"
             value={markDate}
             onChange={(e) => setMarkDate(e.target.value)}
@@ -79,7 +83,9 @@ function HabitForm({
 
           <div className="buttons">
             <Button type="submit">{action}</Button>
-            <Button type="button" onClick={closeModal}>Cancel</Button>
+            <Button type="button" onClick={closeModal}>
+              Cancel
+            </Button>
           </div>
         </form>
       </div>

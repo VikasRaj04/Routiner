@@ -1,13 +1,19 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import './helper.css'; // External CSS import
 
 const NotFound = () => {
-return (
-  <div style={{ textAlign: 'center', marginTop: '50px', background: 'black' }}>
-    <h1>404 - Page Not Found</h1>
-    <p>Sorry, the page you are looking for does not exist.</p>
-    <a href="/">Back To HOME</a>
-  </div>
-);
+  return (
+    <div className="notfound-wrapper">
+      <div className="notfound-card">
+        <h1 className="notfound-title">404</h1>
+        <p className="notfound-message">Oops! The page you're looking for doesn't exist.</p>
+        <Link to="/" className="notfound-button">
+          ⬅ Back to Dashboard
+        </Link>
+      </div>
+    </div>
+  );
 };
 
 export default NotFound;

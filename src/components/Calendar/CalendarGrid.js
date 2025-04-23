@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { generateCalendarDates } from "../../utils/dateUtils";
 
 const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -7,45 +7,46 @@ const monthNames = [
   "July", "August", "September", "October", "November", "December"
 ];
 
-export const CalendarGrid = ({ onDateClick, markedDates = [], futureHabits = [] }) => {
+export const CalendarGrid = React.memo(({ onDateClick, markedDates = [], futureHabits = [] }) => {
   const todayDate = new Date();
   const [currentMonth, setCurrentMonth] = useState(todayDate.getMonth());
   const [currentYear, setCurrentYear] = useState(todayDate.getFullYear());
 
   const today = todayDate.toDateString();
-  const dates = generateCalendarDates(currentYear, currentMonth);
 
-  const handlePrevMonth = () => {
+  // Memoize the result of calendar dates generation to prevent unnecessary recalculations
+  const dates = useMemo(() => generateCalendarDates(currentYear, currentMonth), [currentYear, currentMonth]);
+
+  const handlePrevMonth = useCallback(() => {
     setCurrentMonth((prev) => (prev === 0 ? 11 : prev - 1));
     if (currentMonth === 0) setCurrentYear((prev) => prev - 1);
-  };
+  }, [currentMonth]);
 
-  const handleNextMonth = () => {
+  const handleNextMonth = useCallback(() => {
     setCurrentMonth((prev) => (prev === 11 ? 0 : prev + 1));
     if (currentMonth === 11) setCurrentYear((prev) => prev + 1);
-  };
+  }, [currentMonth]);
 
-  const formatDate = (date) => {
+  const formatDate = useCallback((date) => {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`; // yyyy-mm-dd format
-  };
+  }, []);
 
-  // Get the habit name from future habits based on the startDate
-  const getFutureHabitName = (date) => {
+  // Memoize the function to get future habit name to prevent recalculations on each render
+  const getFutureHabitName = useCallback((date) => {
     const formattedDate = formatDate(date);
-    // Find a future habit where the startDate matches the formatted date
     const futureHabit = futureHabits.find(habit => habit.startDate === formattedDate);
     return futureHabit ? futureHabit.name : null;
-  };
+  }, [futureHabits, formatDate]);
 
-  const getMarkHabitName = (date) => {
+  // Memoize the function to get marked habit name to prevent recalculations on each render
+  const getMarkHabitName = useCallback((date) => {
     const formattedDate = formatDate(date);
-
     const markHabit = markedDates.find(habit => habit.markDate === formattedDate);
     return markHabit ? markHabit.name : null;
-  }
+  }, [markedDates, formatDate]);
 
   return (
     <div className="calendar-wrapper">
@@ -81,10 +82,8 @@ export const CalendarGrid = ({ onDateClick, markedDates = [], futureHabits = [] 
           const day = dateObj.date.getDate();
           const isToday = dateObj.date.toDateString() === today;
           const isInactive = !dateObj.isCurrentMonth;
-          // const isMarked = markedDates.includes(formatDate(dateObj.date));
           const markedHabitName = getMarkHabitName(dateObj.date);
           const futureHabitName = getFutureHabitName(dateObj.date);
-          
 
           return (
             <div
@@ -92,7 +91,7 @@ export const CalendarGrid = ({ onDateClick, markedDates = [], futureHabits = [] 
               className={`calendar-cell 
                 ${isToday ? "today" : ""} 
                 ${isInactive ? "inactive" : ""}
-                ${markedHabitName ? "marked" : ""}
+                ${markedHabitName ? "marked" : ""} 
                 ${futureHabitName ? "future" : ""}
                 `}
               onClick={() => onDateClick(dateObj.date)}
@@ -114,4 +113,4 @@ export const CalendarGrid = ({ onDateClick, markedDates = [], futureHabits = [] 
       </div>
     </div>
   );
-};
+});

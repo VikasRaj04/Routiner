@@ -9,17 +9,35 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
+// Helper function for fetching history data
+const fetchHistoryData = async (userId) => {
+  const historyRef = collection(db, `users/${userId}/history`);
+  const snapshot = await getDocs(historyRef);
+
+  // Log the raw data to inspect
+  const fetchedData = snapshot.docs.map((doc) => {
+    const data = doc.data();
+
+    // If timestamp exists, convert it
+    if (data.timestamp) {
+      data.timestamp = data.timestamp.toMillis(); // Convert to milliseconds
+    }
+    return {
+      id: doc.id,
+      ...data,
+    };
+  });
+
+  return fetchedData;
+};
+
+
 // ✅ Thunk: Fetch current history
 export const fetchHistory = createAsyncThunk(
   "history/fetchHistory",
   async (userId, { rejectWithValue }) => {
     try {
-      const historyRef = collection(db, `users/${userId}/history`);
-      const snapshot = await getDocs(historyRef);
-      const historyData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const historyData = await fetchHistoryData(userId);
       return historyData;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -50,7 +68,7 @@ export const addHistoryEntry = createAsyncThunk(
         habitId,
         habitName,
         changes,
-        timestamp: new Date(), // Placeholder until Firestore returns real timestamp
+        timestamp: new Date(), // Placeholder for timestamp
       };
     } catch (error) {
       return rejectWithValue(error.message);
@@ -76,20 +94,12 @@ export const clearHistory = createAsyncThunk(
   }
 );
 
-// ✅ Thunk: Fetch lifetime history (can be same as normal if needed)
+// ✅ Thunk: Fetch lifetime history
 export const fetchLifetimeHistory = createAsyncThunk(
   "history/fetchLifetimeHistory",
   async (userId, { rejectWithValue }) => {
     try {
-      const querySnapshot = await getDocs(
-        collection(db, `users/${userId}/history`)
-      );
-      let historyData = [];
-
-      querySnapshot.forEach((doc) => {
-        historyData.push({ id: doc.id, ...doc.data() });
-      });
-
+      const historyData = await fetchHistoryData(userId);
       return historyData;
     } catch (error) {
       return rejectWithValue(error.message);

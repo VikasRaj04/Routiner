@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchProgress, selectDailyGraphData, selectProgressLoading } from '../../store/slices/ProgressSlice';
 
 const FilterInsights = () => {
-  const progressData = useSelector((state) => state.progress);
+  const dispatch = useDispatch();
+  const progressData = useSelector(selectDailyGraphData);
+  const loading = useSelector(selectProgressLoading);
+  const userId = useSelector(state => state.auth.userId);
+
   const [selectedFilter, setSelectedFilter] = useState('thisWeek');
   const [showCalendar, setShowCalendar] = useState(false);
   const [startDate, setStartDate] = useState('');
@@ -11,54 +16,60 @@ const FilterInsights = () => {
   const [smartTip, setSmartTip] = useState('');
 
   useEffect(() => {
-    const dataArray = Array.isArray(progressData?.dailyGraph)
-      ? progressData.dailyGraph
-      : [];
-
-    if (!dataArray.length) {
-      setFilteredData([]);
-      setSmartTip('');
-      return;
+    if (userId && !progressData.length) {
+      dispatch(fetchProgress(userId));
+    } else if (!userId) {
+      console.error('No user ID found.');
     }
+  }, [dispatch, userId, progressData.length]);
 
+  // Memoize the filtered data for optimization
+  const filterData = useMemo(() => {
+    const dataArray = Array.isArray(progressData) ? progressData : [];
+    if (!dataArray.length) return [];
+    
     const today = new Date();
     let start, end;
 
-    if (selectedFilter === 'thisWeek') {
-      const day = today.getDay();
-      const diffToMonday = day === 0 ? -6 : 1 - day;
-      start = new Date(today);
-      start.setDate(today.getDate() + diffToMonday);
-      end = new Date(start);
-      end.setDate(start.getDate() + 6);
-    } else if (selectedFilter === 'thisMonth') {
-      start = new Date(today.getFullYear(), today.getMonth(), 1);
-      end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    } else if (selectedFilter === 'custom' && startDate && endDate) {
-      start = new Date(startDate);
-      end = new Date(endDate);
-    } else {
-      setFilteredData([]);
-      setSmartTip('');
-      return;
+    switch (selectedFilter) {
+      case 'thisWeek':
+        const diffToMonday = today.getDay() === 0 ? -6 : 1 - today.getDay();
+        start = new Date(today);
+        start.setDate(today.getDate() + diffToMonday);
+        end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        break;
+
+      case 'thisMonth':
+        start = new Date(today.getFullYear(), today.getMonth(), 1);
+        end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+        break;
+
+      case 'custom':
+        start = new Date(startDate);
+        end = new Date(endDate);
+        break;
+
+      default:
+        return [];
     }
 
-    const filtered = dataArray
-      .filter((entry) => {
-        const date = new Date(entry.date);
-        return date >= start && date <= end && entry.progress > 0;
-      });
-
-    setFilteredData(filtered);
-    generateInsight(filtered);
+    return dataArray.filter((entry) => {
+      const date = new Date(entry.date);
+      return date >= start && date <= end && entry.progress > 0;
+    });
   }, [selectedFilter, startDate, endDate, progressData]);
 
-  const generateInsight = (data) => {
-    if (!data || data.length === 0) {
+  useEffect(() => {
+    if (!filterData.length) {
       setSmartTip('No data in selected range.');
-      return;
+    } else {
+      generateInsight(filterData);
     }
+    setFilteredData(filterData);
+  }, [filterData]);
 
+  const generateInsight = (data) => {
     const count = {
       Sunday: 0, Monday: 0, Tuesday: 0,
       Wednesday: 0, Thursday: 0, Friday: 0, Saturday: 0,
@@ -91,17 +102,18 @@ const FilterInsights = () => {
     });
   };
 
+  if (loading) {
+    return <div>Loading progress data...</div>;
+  }
+
   return (
     <div className="filter-insight-container">
-
-      {/* Filter Buttons */}
       <div className="filter-buttons">
         <button onClick={() => { setSelectedFilter('thisWeek'); setShowCalendar(false); }} className={selectedFilter === 'thisWeek' ? 'active' : ''}>This Week</button>
         <button onClick={() => { setSelectedFilter('thisMonth'); setShowCalendar(false); }} className={selectedFilter === 'thisMonth' ? 'active' : ''}>This Month</button>
         <button onClick={() => { setSelectedFilter('custom'); setShowCalendar(true); }} className={selectedFilter === 'custom' ? 'active' : ''}>Custom</button>
       </div>
 
-      {/* Custom Date Inputs */}
       {showCalendar && selectedFilter === 'custom' && (
         <div className="calendar-range">
           <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
@@ -109,7 +121,6 @@ const FilterInsights = () => {
         </div>
       )}
 
-      {/* Mini Insights */}
       {filteredData.length > 0 && (
         <ul className="progress-list">
           {filteredData.map((entry, index) => (
@@ -124,7 +135,6 @@ const FilterInsights = () => {
         </ul>
       )}
 
-      {/* Smart Tip */}
       {smartTip && (
         <div className="smart-tip">
           <strong>💡 Tip:</strong> {smartTip}

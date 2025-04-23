@@ -1,34 +1,28 @@
 // src/redux/slices/BadgeSlice.js
-import { createSlice } from "@reduxjs/toolkit";
-
-// src/redux/slices/BadgeSlice.js (continue in same file)
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 
-
-// 🧠 Fetch unlocked badges from Firestore
+// 🎯 Async thunk: Fetch user's unlocked badges from Firestore
 export const fetchUserBadges = createAsyncThunk(
   "badges/fetchUserBadges",
-  async (uid, thunkAPI) => {
+  async (uid, { rejectWithValue }) => {
     try {
       const snapshot = await getDocs(collection(db, "users", uid, "achievements"));
-      const badges = snapshot.docs.map((doc) => ({
+      return snapshot.docs.map((doc) => ({
         badgeId: doc.id,
         ...doc.data(),
       }));
-      return badges;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.message);
+      return rejectWithValue(error.message);
     }
   }
 );
 
-
 const initialState = {
-  badges: [],               // 🏅 All unlocked badges
-  loading: false,           // ⏳ For async badge fetch/save
-  error: null,              // ❌ For error handling
+  badges: [],         // 🏅 All unlocked badges
+  loading: false,     // ⏳ Async status
+  error: null,        // ❌ Error state
 };
 
 const badgeSlice = createSlice({
@@ -39,7 +33,7 @@ const badgeSlice = createSlice({
       state.badges = action.payload;
     },
     addBadge: (state, action) => {
-      state.badges.unshift(action.payload); // 🆕 Add on top
+      state.badges.unshift(action.payload); // 🔝 Add to top
     },
     removeBadge: (state, action) => {
       state.badges = state.badges.filter(
@@ -56,7 +50,6 @@ const badgeSlice = createSlice({
       state.badges = [];
     },
   },
-  // Add this inside badgeSlice
   extraReducers: (builder) => {
     builder
       .addCase(fetchUserBadges.pending, (state) => {
@@ -69,10 +62,9 @@ const badgeSlice = createSlice({
       })
       .addCase(fetchUserBadges.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to load badges";
       });
-  }
-
+  },
 });
 
 export const {

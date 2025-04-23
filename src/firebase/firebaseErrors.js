@@ -1,94 +1,121 @@
 const getFirebaseErrorMessage = (error) => {
     const code = error?.code || "";
-    const message = error?.message || "";
+    const rawMessage = error?.message || "";
+    let message = "";
 
     switch (code) {
         // Firebase Auth Errors
         case "auth/email-already-in-use":
-            return "This email is already registered. Please use a different email.";
+            message = "This email is already registered. Please use a different email.";
+            break;
         case "auth/invalid-email":
-            return "The email address is not valid.";
+            message = "The email address is not valid.";
+            break;
         case "auth/weak-password":
-            return "The password is too weak. Please choose a stronger password.";
+            message = "The password is too weak. Please choose a stronger password.";
+            break;
         case "auth/operation-not-allowed":
-            return "Email/password accounts are not enabled. Please contact support.";
+            message = "Email/password accounts are not enabled. Please contact support.";
+            break;
         case "auth/user-disabled":
-            return "This user account has been disabled.";
+            message = "This user account has been disabled.";
+            break;
         case "auth/user-not-found":
-            return "No account found with this email.";
+            message = "No account found with this email.";
+            break;
         case "auth/wrong-password":
-            return "Incorrect password. Please try again.";
+            message = "Incorrect password. Please try again.";
+            break;
         case "auth/too-many-requests":
-            return "Too many login attempts. Please try again later.";
+            message = "Too many login attempts. Please try again later.";
+            break;
         case "auth/network-request-failed":
-            return "Network error occurred. Please check your internet connection.";
+            message = "Network error occurred. Please check your internet connection.";
+            break;
         case "auth/popup-closed-by-user":
-            return "The sign-in popup was closed before completing the sign-in.";
+            message = "The sign-in popup was closed before completing the sign-in.";
+            break;
         case "auth/cancelled-popup-request":
-            return "Popup request was cancelled due to another popup being opened.";
+            message = "Popup request was cancelled due to another popup being opened.";
+            break;
         case "auth/popup-blocked":
-            return "Popup was blocked by the browser. Please allow popups.";
+            message = "Popup was blocked by the browser. Please allow popups.";
+            break;
         case "auth/internal-error":
-            return "An internal error occurred. Please try again.";
+            message = "An internal error occurred. Please try again.";
+            break;
 
         // Firestore / Realtime DB Errors
         case "permission-denied":
-            return "You do not have permission to perform this action.";
+            message = "You do not have permission to perform this action.";
+            break;
         case "unavailable":
-            return "The service is currently unavailable. Please try again later.";
+            message = "The service is currently unavailable. Please try again later.";
+            break;
         case "deadline-exceeded":
-            return "The operation took too long to complete. Please try again.";
+            message = "The operation took too long to complete. Please try again.";
+            break;
         case "not-found":
-            return "Requested data was not found.";
+            message = "Requested data was not found.";
+            break;
         case "already-exists":
-            return "This item already exists.";
+            message = "This item already exists.";
+            break;
         case "resource-exhausted":
-            return "Quota exceeded. Try again later.";
+            message = "Quota exceeded. Try again later.";
+            break;
 
         // Firebase Storage Errors
         case "storage/object-not-found":
-            return "The requested file does not exist.";
+            message = "The requested file does not exist.";
+            break;
         case "storage/unauthorized":
-            return "You are not authorized to access this file.";
+            message = "You are not authorized to access this file.";
+            break;
         case "storage/canceled":
-            return "The upload was canceled.";
+            message = "The upload was canceled.";
+            break;
         case "storage/unknown":
-            return "An unknown error occurred with storage.";
+            message = "An unknown error occurred with storage.";
+            break;
 
         // Network Errors
         case "net::ERR_INTERNET_DISCONNECTED":
         case "ERR_INTERNET_DISCONNECTED":
-            return "You are offline. Please check your internet connection.";
+            message = "You are offline. Please check your internet connection.";
+            break;
         case "net::ERR_CONNECTION_TIMED_OUT":
         case "ERR_CONNECTION_TIMED_OUT":
-            return "The connection timed out. Please try again.";
+            message = "The connection timed out. Please try again.";
+            break;
         case "net::ERR_NETWORK_CHANGED":
         case "ERR_NETWORK_CHANGED":
-            return "Your network connection changed. Please try again.";
+            message = "Your network connection changed. Please try again.";
+            break;
         case "net::ERR_NAME_NOT_RESOLVED":
         case "ERR_NAME_NOT_RESOLVED":
-            return "Unable to resolve the server. Please check your connection.";
+            message = "Unable to resolve the server. Please check your connection.";
+            break;
+        default:
+            message = "";
     }
 
-    // 🔁 Extra fallback using error.message
-    if (message.includes("client is offline")) {
-        return "You are offline. Please check your internet connection.";
+    // 🔁 Fallbacks based on message string
+    if (!message) {
+        if (rawMessage.includes("client is offline")) {
+            message = "You are offline. Please check your internet connection.";
+        } else if (rawMessage.includes("Failed to get document")) {
+            message = "Failed to fetch data. Please check your network and try again.";
+        } else if (rawMessage.includes("quota exceeded")) {
+            message = "You’ve reached your quota limit. Please try again later.";
+        } else if (rawMessage.includes("timeout")) {
+            message = "The request timed out. Try again in a few seconds.";
+        } else {
+            message = "An unexpected error occurred. Please try again later.";
+        }
     }
 
-    if (message.includes("Failed to get document")) {
-        return "Failed to fetch data. Please check your network and try again.";
-    }
-
-    if (message.includes("quota exceeded")) {
-        return "You’ve reached your quota limit. Please try again later.";
-    }
-
-    if (message.includes("timeout")) {
-        return "The request timed out. Try again in a few seconds.";
-    }
-
-    // 🚨 Default fallback
-    return "An unexpected error occurred. Please try again later.";
+    return message;
 };
 
 export default getFirebaseErrorMessage;

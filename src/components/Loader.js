@@ -1,15 +1,12 @@
-import React from 'react'
+import React from 'react';
+import './helper.css'; // Linking external CSS file
 
-function Loader() {
-  let style = {
-    color: 'red',
-    background: 'black',
-  }
+const Loader = () => {
   return (
-    <div className='loader' style={style}>
-      <p></p>
+    <div className="loader-container">
+      <div className="loader"></div>
     </div>
-  )
-}
+  );
+};
 
-export default Loader
+export default Loader;

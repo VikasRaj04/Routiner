@@ -10,22 +10,21 @@ const AddHabitModal = ({ closeModal }) => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Uncategorized");
   const [frequency, setFrequency] = useState("1/1");
-  const [startDate, setStartDate] = useState("");  // Define startDate state
-  const [markDate, setMarkDate] = useState("");    // Define markDate state
+  const [startDate, setStartDate] = useState("");
+  const [markDate, setMarkDate] = useState("");
 
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth.user?.uid);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!habitName.trim()) {
-      alert("Habit Name is required!");
-      return;
+    if (!habitName || habitName.trim() === "") {
+      console.warn("habitName is required!");
+      return alert("Habit Name is required!");
     }
 
     const newHabit = {
-      name: habitName,
+      name : habitName, // Make sure to use habitName here
       description,
       category,
       frequency,
@@ -34,25 +33,18 @@ const AddHabitModal = ({ closeModal }) => {
     };
 
     if (userId) {
-      // Dispatch habit add action and wait for Firebase to return the ID
-      const resultAction = await dispatch(addNewHabit({ userID: userId, habitData: newHabit }));
-
-      const habitId = resultAction?.payload?.id; // ID from Firebase response (if returned)
+      const result = await dispatch(addNewHabit({ userID: userId, habitData: newHabit }));
+      const habitId = result?.payload?.id; // Get habitId from the action result
       const isGuest = userId.startsWith("guest_");
 
       if (!isGuest && habitId) {
-        await addHistoryEntry(userId, {
-          habitId,
-          action: "created",
-          timestamp: new Date().toISOString(),
-          habitName,
-        });
-        console.log(habitId, "History Habit Created ")
+        await addHistoryEntry(userId, "Created", habitId, habitName); // Pass habitName as expected
       }
     }
 
     closeModal();
-  };
+};
+
 
   return (
     <HabitForm
@@ -66,10 +58,10 @@ const AddHabitModal = ({ closeModal }) => {
       setCategory={setCategory}
       frequency={frequency}
       setFrequency={setFrequency}
-      startDate={startDate}      // Pass startDate to HabitForm
-      setStartDate={setStartDate}  // Pass setStartDate to HabitForm
-      markDate={markDate}        // Pass markDate to HabitForm
-      setMarkDate={setMarkDate}  // Pass setMarkDate to HabitForm
+      startDate={startDate}
+      setStartDate={setStartDate}
+      markDate={markDate}
+      setMarkDate={setMarkDate}
       action="Add Habit"
     />
   );

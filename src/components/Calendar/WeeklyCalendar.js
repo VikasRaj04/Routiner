@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserHabits } from "../../store/slices/habitSlice";
 
@@ -24,20 +24,27 @@ const getCurrentWeekDates = () => {
     return weekDates;
 };
 
-
-
-export const WeeklyCalendar = ({ onDateClick }) => {
+export const WeeklyCalendar = React.memo(({ onDateClick }) => {
     const dispatch = useDispatch();
     const userId = useSelector(state => state.auth.userId);
     const totalHabits = useSelector(state => state.habits.totalHabits) || [];
-    const weekDates = getCurrentWeekDates();
-    const todayStr = new Date().toDateString();
+
+    // Memoize the week dates to prevent unnecessary recalculations
+    const weekDates = useMemo(() => getCurrentWeekDates(), []);
+    const todayStr = useMemo(() => new Date().toDateString(), []);
 
     useEffect(() => {
         dispatch(fetchUserHabits(userId));
-    }, [userId])
+    }, [dispatch, userId]);
 
-    console.log(totalHabits);
+    // Memoize the habit filtering logic to prevent unnecessary re-renders
+    const habitsForDate = (date) => {
+        return totalHabits.filter(habit => {
+            if (!habit.startDate) return true;
+            const habitStartDate = new Date(habit.startDate);
+            return habitStartDate <= date;
+        });
+    };
 
     return (
         <div className="weekly-calendar">
@@ -51,16 +58,7 @@ export const WeeklyCalendar = ({ onDateClick }) => {
                 <div className="calendar-grid weekly-view">
                     {weekDates.map((date, index) => {
                         const isToday = date.toDateString() === todayStr;
-
-                        const habitsForDate = totalHabits.filter(habit => {
-                            if (!habit.startDate) return true;
-
-                            const habitStartDate = new Date(habit.startDate);
-                            if (habitStartDate <= date) return true;
-
-                            return false;
-                        });
-                        console.log(habitsForDate);
+                        const habitsForCurrentDate = habitsForDate(date);
 
                         return (
                             <div
@@ -71,7 +69,7 @@ export const WeeklyCalendar = ({ onDateClick }) => {
                                 <span className="date-number">{date.getDate()}</span>
 
                                 <div className="habit-lines">
-                                    {habitsForDate.map((habit, i) => (
+                                    {habitsForCurrentDate.map((habit, i) => (
                                         <div key={i} className="habit-line" title={habit.name}>
                                             {habit.name}
                                         </div>
@@ -84,4 +82,4 @@ export const WeeklyCalendar = ({ onDateClick }) => {
             </div>
         </div>
     );
-};
+});

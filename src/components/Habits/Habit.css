@@ -1,11 +1,5 @@
 /* HabitList */
-
-
 .habit-list {
-    /* display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    justify-items: center;
-    align-content: center; */
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -21,11 +15,10 @@
 
 .habitlist-heading {
     font-size: 1.3rem;
-    /* margin-top: 40px; */
 }
 
-/* pagination */
-.pagination{
+/* Pagination */
+.pagination {
     text-align: right;
 }
 
@@ -45,21 +38,17 @@
     cursor: not-allowed;
 }
 
-.pagination span{
+.pagination span {
     color: var(--primary-blue-100);
 }
 
-
 /* HabitCard */
-
 .habit-card {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     flex: 1 1 300px;
-    /* max-width: 300px; */
     box-sizing: border-box;
     gap: 0 12px;
     background-color: #EAF4FF;
@@ -92,12 +81,8 @@
 }
 
 .habit-card-content {
-    /* border-left: 3px solid var(--primary-blue-100); */
     width: 85%;
     padding-right: 10px;
-    /* display: flex; */
-    /* align-items: center; */
-    /* gap: 0 50px; */
 }
 
 .habit-freq-streak p {
@@ -110,8 +95,7 @@
     font-weight: bold;
 }
 
-
-/* habit-action-btn */
+/* Habit-action-btn */
 .habit-action-btn {
     width: 15%;
     padding: 0 12px;
@@ -127,18 +111,19 @@
     font-size: 13px;
 }
 
-
-/* edit-button */
-
-.edit-button {
+/* Edit Button */
+.edit-button, .delete-button {
     background: transparent;
-    border: 1.5px solid #6BFF6B;
     border-radius: 25px;
-    color: #3BFF7B;
-    cursor: pointer;
     font-size: 1.1rem;
     padding: 6px 12px;
     transition: transform 0.2s ease-in-out, border 0.2s ease-in-out, color 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.edit-button {
+    border: 1.5px solid #6BFF6B;
+    color: #3BFF7B;
 }
 
 .edit-button:hover {
@@ -147,19 +132,9 @@
     border: 2px solid #00a500;
 }
 
-
-
-/* DeleteBtn */
-
 .delete-button {
-    background: transparent;
     border: 1.5px solid #FF6B6B;
-    border-radius: 25px;
     color: #FF3B3B;
-    cursor: pointer;
-    font-size: 1.1rem;
-    padding: 6px 12px;
-    transition: transform 0.2s ease-in-out, color 0.2s ease-in-out, border 0.2s ease-in-out;
 }
 
 .delete-button:hover {
@@ -168,9 +143,7 @@
     border: 2px solid #ff1a1a;
 }
 
-
-/* Add Habit */
-
+/* Modal Overlay and Content */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -181,13 +154,14 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1000;
 }
 
 .modal-content {
     background-color: white;
     padding: 20px;
     border-radius: 8px;
-    max-width: 400px;
+    max-width: 500px;
     width: 100%;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
@@ -229,31 +203,7 @@
     margin-left: 10px;
 }
 
-
-/* cut icon */
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    position: relative;
-    max-width: 500px;
-    width: 100%;
-}
-
+/* Close button */
 .close-btn {
     position: absolute;
     top: 10px;
@@ -268,11 +218,7 @@
     color: #ff0000;
 }
 
-
-
-
-
-/* EditHabitModal.css */
+/* Edit Habit Modal */
 .edit-modal-overlay {
     position: fixed;
     top: 0;
@@ -327,26 +273,12 @@
     background-color: #3038d0;
 }
 
-.close-btn {
-    background: transparent;
-    border: none;
-    color: #000;
-    font-size: 20px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-}
-
-
-
 /* No Habits - Add Habits */
-
-.no-habits-card{
+.no-habits-card {
     display: grid;
 }
 
-.add-habit-btn{
+.add-habit-btn {
     margin-top: 12px;
     text-transform: uppercase;
     font-weight: bolder;
@@ -356,3 +288,5 @@
     color: #EAF4FF;
     place-items: center;
 }
+
+

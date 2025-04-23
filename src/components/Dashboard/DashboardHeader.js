@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { auth, db } from "../../firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -50,13 +50,13 @@ function DashboardHeader() {
     fetchUserData();
   }, [reduxUser, dispatch]);
 
-  // 🔹 Format today's date (for display)
-  const currentDate = new Date().toLocaleDateString("en-IN", {
+  // 🔹 Memoize today's date to avoid unnecessary recalculations
+  const currentDate = useMemo(() => new Date().toLocaleDateString("en-IN", {
     weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
-  });
+  }), []);
 
   return (
     <header className="dashboard-header">

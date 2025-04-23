@@ -1,12 +1,9 @@
 import React from 'react';
-import './CompoDashboard.css';
-import {CategoryGraph, DailyGraph, WeeklyGraph} from '../index';
+import { CategoryGraph, DailyGraph, WeeklyGraph } from '../index';
 
-
-function Graph() {
+const Graph = React.memo(() => {
   return (
     <section className="graphs">
-
       <div className="graphs-section">
         <div className="main-graph">
           <DailyGraph />
@@ -17,7 +14,7 @@ function Graph() {
         </div>
       </div>
     </section>
-  )
-}
+  );
+});
 
-export default Graph
+export default Graph;

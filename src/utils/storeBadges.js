@@ -3,21 +3,16 @@ import { db } from "../firebase/firebase";
 
 // Auto-generator for multi-streak badges (e.g. 1x to 100x or more)
 const generateMultiStreakBadges = (maxStreaks = 100) => {
-    const badges = [];
-
-    for (let streakCount = 1; streakCount <= maxStreaks; streakCount++) {
-        const totalDays = 21 * streakCount;
-
-        badges.push({
-            badgeId: `streak_${streakCount}`,
-            name: `${streakCount}x Streaker`,
+    return Array.from({ length: maxStreaks }, (_, streakCount) => {
+        const totalDays = 21 * (streakCount + 1); // Adjusting for 1-based streak count
+        return {
+            badgeId: `streak_${streakCount + 1}`,
+            name: `${streakCount + 1}x Streaker`,
             emoji: "🔥",
-            description: `21-day streak in ${streakCount} different habits (${totalDays} total days).`,
+            description: `21-day streak in ${streakCount + 1} different habits (${totalDays} total days).`,
             type: "streak-multi",
-        });
-    }
-
-    return badges;
+        };
+    });
 };
 
 export const storeBadges = async () => {
@@ -160,7 +155,6 @@ export const storeBadges = async () => {
             type: "streak-milestone",
         },
 
-
         // 🔁 Streak-Multi (auto-generated)
         ...generateMultiStreakBadges(100), // Change number to increase max streak level
     ];
@@ -173,7 +167,6 @@ export const storeBadges = async () => {
             await setDoc(badgeRef, badge);
         }
 
-        console.log("✅ All badges successfully stored in Firestore!");
     } catch (error) {
         console.error("❌ Error storing badges:", error);
     }

@@ -1,54 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { modifyHabit } from "../../store/slices/habitSlice";
+import { modifyHabit, closeEditModal } from "../../store/slices/habitSlice";
 import "./Habit.css";
 import HabitForm from "./HabitForm";
 
-const EditHabitModal = ({ habit, closeModal }) => {
+const EditHabitModal = () => {
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.habits.userInfo?.uid);
+  const habitToEdit = useSelector((state) => state.habits.habitToEdit);
 
-  // 🟢 Initial State: old habit data se prefill
-  const [habitName, setHabitName] = useState(habit.name);
-  const [description, setDescription] = useState(habit.description);
-  const [category, setCategory] = useState(habit.category);
-  const [frequency, setFrequency] = useState(habit.frequency);
-  const [startDate, setStartDate] = useState(habit.startDate);
-  const [markDate, setMarkDate] = useState(habit.markDate);
+  // Setting state based on the selected habit to edit
+  const [habitName, setHabitName] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
+  const [frequency, setFrequency] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [markDate, setMarkDate] = useState("");
 
+  useEffect(() => {
+    if (habitToEdit) {
+      setHabitName(habitToEdit.name);
+      setDescription(habitToEdit.description);
+      setCategory(habitToEdit.category);
+      setFrequency(habitToEdit.frequency);
+      setStartDate(habitToEdit.startDate);
+      setMarkDate(habitToEdit.markDate);
+    }
+  }, [habitToEdit]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!habitName.trim()) return alert("Habit Name is required!");
 
-    if (!habitName.trim()) {
-      alert("Habit Name is required!");
-      return;
-    }
-
-    // 🟢 New Updated Data
     const updatedData = { name: habitName, description, category, frequency, markDate, startDate };
-
-    // 🟢 Old Data (for history tracking)
-    const oldData = { name: habit.name, description: habit.description, category: habit.category, frequency: habit.frequency, markDate: habit?.markDate || "", startDate: habit.startDate };
+    const oldData = {
+      name: habitToEdit.name,
+      description: habitToEdit.description,
+      category: habitToEdit.category,
+      frequency: habitToEdit.frequency,
+      markDate: habitToEdit.markDate || "",
+      startDate: habitToEdit.startDate,
+    };
 
     if (userId) {
-      const result = await dispatch(
-        modifyHabit({ userID: userId, habitID: habit.id, updatedData, oldData }) // 🔥 oldData pass karo
-      ).unwrap();
+      try {
+        const result = await dispatch(
+          modifyHabit({ userID: userId, habitID: habitToEdit.id, updatedData, oldData })
+        ).unwrap();
 
-      if (result) {
-        closeModal();
-      } else {
-        alert("Failed to update habit. Please try again.");
+        if (result) {
+          dispatch(closeEditModal()); // Close modal if successful
+        } else {
+          alert("Failed to update habit. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error updating habit:", error);
+        alert("An error occurred while updating the habit.");
       }
     }
-
-    closeModal();
   };
 
   return (
     <HabitForm
-      closeModal={closeModal}
+      closeModal={() => dispatch(closeEditModal())}
       handleSubmit={handleSubmit}
       habitName={habitName}
       setHabitName={setHabitName}

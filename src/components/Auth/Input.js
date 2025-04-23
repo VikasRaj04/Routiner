@@ -2,15 +2,18 @@ import React from 'react';
 
 function Input({ label, id, type = 'text', placeholder, value, onChange, ...props }) {
     return (
-        <input
-            type={type}
-            placeholder={placeholder}
-            id={id}
-            value={value}
-            onChange={onChange}
-            {...props}
-        />
-    )
+        <div className="input-container">
+            {label && <label htmlFor={id}>{label}</label>}
+            <input
+                type={type}
+                id={id}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+                {...props}
+            />
+        </div>
+    );
 }
 
-export default Input
+export default Input;

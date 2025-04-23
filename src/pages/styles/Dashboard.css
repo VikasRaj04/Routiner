@@ -1,3 +1,4 @@
+/* General Styles */
 .dashboard-main {
     width: calc(100vw - 250px);
     position: absolute;
@@ -13,26 +14,485 @@
     margin: 10px;
     border-radius: 8px;
     background: linear-gradient(270deg, #ebebeb 0%, #6b73ff 0%, #000dff 100%);
-    /* background-image: url(../../images/background-with-girl.png); */
-    /* background-repeat: no-repeat; */
-    /* background-position: center center; */
-    /* background-size: cover; */
     color: white;
     overflow: hidden;
     mix-blend-mode: multiply;
 }
 
-.dashboard-header .header-content{
+.dashboard-header .header-content {
     display: flex;
     gap: 4px 0;
     flex-direction: column;
 }
 
-.dashboard-header .header-content h2{
+.dashboard-header .header-content h2 {
     font-size: 1.6rem;
     font-weight: 500;
 }
 
-.dashboard-header .header-content p{
+.dashboard-header .header-content p {
     font-size: 0.9rem;
+}
+
+/* Dashboard Overview Section */
+.dashboard-overview {
+    padding: 10px 0;
+    font-family: Arial, sans-serif;
+}
+
+.key-metrics {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.metric-card {
+    padding: 15px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    flex: 1;
+    margin: 0 10px;
+}
+
+.graphs {
+    display: flex;
+    justify-content: space-around;
+    margin: 10px 0;
+}
+
+.graphs-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+}
+
+.main-graph {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+    padding: 20px 10px;
+    font-size: 14px;
+}
+
+.daily-graph-container {
+    width: 100%;
+    max-width: 960px;
+    margin: auto;
+    padding: 1rem;
+    background-color: #fff;
+    border-radius: 0.7rem;
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.daily-graph-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.daily-graph-empty {
+    text-align: center;
+    color: #666;
+    font-size: 0.95rem;
+    margin-top: 1rem;
+}
+
+/* Graph Sparkle Effect */
+.sparkle-dot {
+    fill: #3843FF;
+    stroke: white;
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 4px rgba(56, 67, 255, 0.4));
+    transition: transform 0.3s ease;
+}
+
+.sparkle-dot:hover {
+    transform: scale(1.4);
+}
+
+/* Graph Grid */
+.graph-grid {
+    stroke: #e4e4e4;
+}
+
+/* Side Graph Layout */
+.side-graphs {
+    width: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+h2.text-lg {
+    text-align: center;
+    font-size: 1.2rem;
+    margin: 18px;
+}
+
+.weekly-graph,
+.category-graph {
+    text-align: center;
+    font-size: 13px;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+/* Action Buttons */
+.highlights-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.highlights {
+    flex: 1;
+}
+
+.actions {
+    flex: 1;
+    display: flex;
+    justify-content: right;
+}
+
+.actions .dash-act-btn {
+    margin-left: 10px;
+    padding: 10px 15px;
+    border: none;
+    background-color: #3843ff;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.actions .dash-act-btn:hover {
+    background-color: #2d36cc;
+}
+
+/* Add Habit Button */
+.add-habit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.add-habit:hover {
+    transform: scale(1.02);
+    background: linear-gradient(90deg, #4b6dff, #3843ff);
+}
+
+.add-habit>svg {
+    margin-right: 12px;
+    font-size: 28px;
+}
+
+/* Habit Section */
+.habit-section-main {
+    width: 100%;
+    padding: 20px;
+}
+
+/* Highlights Section */
+.highlights-actions {
+    padding: 30px 20px;
+}
+
+.highlights {
+    font-size: 1.1rem;
+}
+
+.highlights p span {
+    font-weight: bold;
+}
+
+.actions a {
+    text-decoration: none;
+    color: white;
+}
+
+/* Overview Card */
+.overview-card {
+    flex: 1;
+    min-width: 250px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.overview-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: #6C757D;
+}
+
+.overview-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: var(--primary-blue-100);
+}
+
+.overview-card p {
+    font-size: 1.1rem;
+    color: #666;
+}
+
+
+
+
+
+@media (max-width: 1024px) {
+
+    .dashboard-main {
+        width: calc(100% - 200px);
+    }
+
+    .graphs-section {
+        flex-direction: column;
+        gap: 6px;
+        background: #ecedf5e1;
+    }
+
+    .main-graph {
+        width: 100%;
+        padding-bottom: 0;
+    }
+
+    .daily-graph-container {
+        padding: 0;
+    }
+
+    .recharts-wrapper {
+        max-height: 380px;
+    }
+
+    .side-graphs {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .weekly-graph,
+    .category-graph {
+        width: 50%;
+    }
+
+    .highlights-actions {
+        padding: 15px 5px 10px 5px;
+        margin-top: 20px;
+        background-color: #e4e4e4;
+    }
+
+    .highlights {
+        font-size: 0.9rem;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .actions {
+        flex: initial;
+    }
+
+    .habit-section-main {
+        padding: 10px;
+    }
+
+    .actions .dash-act-btn {
+        margin-left: 6px;
+        padding: 7px 10px;
+    }
+
+    .actions .dash-act-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .habit-card {
+        flex: 1 1 250px;
+    }
+}
+
+@media (max-width: 769px) {
+
+    .topbar {
+        padding: 0.5rem 1rem;
+    }
+
+
+    .dashboard-main {
+        width: 100%;
+        top: 50px;
+    }
+
+    .dashboard-header {
+        padding: 10px 15px;
+    }
+
+
+    .dashboard-header .header-content h2 {
+        font-size: 1.4rem;
+    }
+
+    .header-content p {
+        line-height: 0.95rem;
+    }
+
+    .dashboard-overview {
+        padding: 0;
+    }
+
+    .metric-card {
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        flex: initial;
+    }
+
+    .graphs {
+        margin: 0;
+    }
+
+    .graphs-section {
+        flex-direction: column;
+    }
+
+    .main-graph,
+    .side-graphs {
+        width: 100%;
+    }
+
+    .main-graph {
+        padding: 10px;
+    }
+
+    .daily-graph-container {
+        margin: 0;
+        padding: 0;
+    }
+
+    .recharts-responsive-container {
+        max-height: 350px;
+    }
+
+    .side-graphs {
+        flex-direction: row;
+    }
+
+    .highlights-actions {
+        margin-top: 30px;
+    }
+
+    .habit-section-main {
+        margin-top: 20px;
+    }
+
+    .habit-list {
+        gap: 14px;
+        padding: 10px;
+    }
+
+    .habit-card {
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+}
+
+@media (max-width: 480px) {
+    .side-graphs {
+        flex-direction: column;
+    }
+
+    .weekly-graph,
+    .category-graph {
+        width: 100%;
+    }
+
+    .highlights-actions {
+        flex-direction: column;
+        gap: 12px 0;
+    }
+
+    .highlights {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+}
+
+@media (max-width: 300px) {
+
+    .dashboard-header {
+        padding: 8px;
+        margin: 6px;
+        border-radius: 6px;
+    }
+
+    .dashboard-header .header-content h2 {
+        font-size: 1.1rem;
+    }
+
+    .dashboard-header .header-content p {
+        font-size: 0.85rem;
+    }
+
+    .key-metrics {
+        flex-direction: column;
+        gap: 4px;
+
+    }
+
+    .daily-graph-title {
+        font-size: 1.05rem;
+    }
+
+    h2.text-lg {
+        font-size: 1.05rem;
+    }
+
+    .highlights{
+        flex-direction: column;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    .pagination{
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .pagination .btn{
+        width: 100%;
+    }
 }

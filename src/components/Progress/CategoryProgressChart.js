@@ -17,16 +17,16 @@ const renderCustomLabel = ({ name, percent }) => {
 };
 
 const CategoryProgressChart = () => {
+  // Call useSelector directly
   const progress = useSelector((state) => state.progress?.categoryMap) || {};
-  const habits = useSelector((state) => state.habits.habits);
 
-  const chartData = Object.entries(progress).map(
-    ([categoryName, habitArray]) => ({
-      name: categoryName,
-      value: habitArray.length,
-    })
-  );
+  // Create chart data directly here (no need for useMemo)
+  const chartData = Object.entries(progress).map(([categoryName, habitArray]) => ({
+    name: categoryName,
+    value: habitArray.length,
+  }));
 
+  // Calculate the total habits count
   const totalHabits = chartData.reduce((sum, cat) => sum + cat.value, 0);
 
   return (
@@ -37,14 +37,14 @@ const CategoryProgressChart = () => {
         <p className="no-data-text">No progress data available.</p>
       ) : (
         <div className="chart-wrapper">
-          <ResponsiveContainer width="100%" height={320}>
+          <ResponsiveContainer>
             <PieChart>
               <Pie
                 data={chartData}
                 cx="50%"
                 cy="50%"
-                innerRadius={70}
-                outerRadius={110}
+                innerRadius={45}
+                outerRadius={80}
                 dataKey="value"
                 labelLine={false}
                 label={renderCustomLabel}

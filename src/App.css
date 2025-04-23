@@ -6,6 +6,9 @@
   font-family: "Roboto", sans-serif;
 }
 
+html, body {
+  overflow-x: hidden;
+}
 
 /* Loader Styles */
 .loader {
@@ -43,4 +46,61 @@
 /* Optional: More Styles for Body (for future scaling) */
 body {
   background-color: #f7f7f7; /* Soft background */
+}
+
+/* components/Topbar.css */
+.topbar {
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: white;
+  color: var(--primary-blue-100);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+}
+
+.hamburger {
+  font-size: 1.25rem;
+  background: none;
+  border: none;
+  color: var(--primary-blue-100);
+  border: 1px solid var(--primary-blue-100);
+  border-radius: 6px;
+  padding: 4px 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+}
+
+/* Show Topbar on small screens */
+@media (max-width: 769px) {
+  .topbar {
+    display: flex;
+    z-index: 999999;
+  }
+
+  .sidebar{
+    display: none;
+    transition: all 0.5s;
+  }
+  
+  .sidebar.open{
+    display: block;
+    position: absolute;
+    top: 45px;
+    z-index: 999;
+  }
+
 }

@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { signInWithEmailAndPassword, validatePassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase/firebase';
 import { Button, Input, Label } from '../index';
-import './Auth.css';
 import { FaEnvelope, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import getFirebaseErrorMessage from '../../firebase/firebaseErrors';
 import { validateEmail } from '../../utils/validation';
 
@@ -21,7 +20,7 @@ function Login() {
     const emailError = validateEmail(email);
 
     if (emailError) {
-      setError({ email: emailError});
+      setError({ email: emailError });
       return;
     }
 
@@ -29,7 +28,7 @@ function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      alert("Login Successfull");
+      alert("Login Successful");
       navigate("/dashboard");
     } catch (error) {
       const errorMessage = getFirebaseErrorMessage(error.code);
@@ -37,17 +36,16 @@ function Login() {
         ...prevError, firebase: errorMessage,
       }));
     }
-  }
+  };
 
   const toggleEye = () => {
-    setShowPassword(!showPassword);
-  }
-
+    setShowPassword((prevShowPassword) => !prevShowPassword);
+  };
 
   return (
     <div className='auth-container'>
       <h2 className='auth-heading'>Continue with E-mail</h2>
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleLogin} autoComplete='on'>
         <div className="email">
           <Label htmlFor="email" label="E-mail: " />
           <Input
@@ -55,6 +53,7 @@ function Login() {
             placeholder='Enter your Email'
             value={email}
             id="email"
+            autoComplete="email"
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => setError((prev) => ({ ...prev, email: validateEmail(email) }))}
           />
@@ -69,12 +68,13 @@ function Login() {
             placeholder='Enter your Password'
             value={password}
             id="password"
+            autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
-            
           />
-          <span onClick={toggleEye} id='eyeBtn'>{showPassword ? <FaEyeSlash /> : <FaEye />}</span>
+          <span onClick={toggleEye} id='eyeBtn'>
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
         </div>
-
 
         <div className="forgot">
           <p className="forgot"><Link to={'/forgot-password'}>Forgot Password</Link></p>
@@ -87,10 +87,8 @@ function Login() {
         <Button type="submit">Login</Button>
         {error.firebase && <p className='error'>{error.firebase}</p>}
       </form>
-
-
     </div>
-  )
+  );
 }
 
-export default Login
+export default Login;

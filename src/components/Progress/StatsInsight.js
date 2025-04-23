@@ -11,37 +11,37 @@ const StatsInsights = () => {
 
   useEffect(() => {
     if (!progressData) return;
-  
+
     const habitCount = {};
     const habitSkipped = {};
     const dayCompletion = {};
     const daySkipped = {};
-  
+
     const allDates = new Set();
     const allHabitIds = Object.keys(progressData);
-  
-    // Step 1: Gather all unique dates
+
+    // Gather all unique dates
     allHabitIds.forEach((habitId) => {
       const completion = progressData[habitId]?.completion || {};
       Object.keys(completion).forEach((date) => allDates.add(date));
     });
-  
-    // Step 2: Process each (habit × date)
+
+    // Process each (habit × date)
     allHabitIds.forEach((habitId) => {
-      const { habitName, completion } = progressData[habitId];
+      const { completion } = progressData[habitId];
       const habitEntries = completion || {};
-  
+
       allDates.forEach((date) => {
         const entry = habitEntries[date];
         const parsedDate = new Date(date);
         if (isNaN(parsedDate)) return;
-  
+
         const day = parsedDate.toLocaleDateString("en-US", {
           weekday: "long",
         });
-  
+
         const isCompleted = entry?.completion >= 90;
-  
+
         if (entry && isCompleted) {
           habitCount[habitId] = (habitCount[habitId] || 0) + 1;
           dayCompletion[day] = (dayCompletion[day] || 0) + 1;
@@ -51,34 +51,34 @@ const StatsInsights = () => {
         }
       });
     });
-  
-    // Calculate best/worst habits
+
+    // Determine consistent and skipped habits
     const consistentHabitId = Object.entries(habitCount).sort(([, a], [, b]) => b - a)[0]?.[0];
     const skippedHabitId = Object.entries(habitSkipped).sort(([, a], [, b]) => b - a)[0]?.[0];
-  
+
     const consistentHabit = progressData[consistentHabitId]?.habitName || "N/A";
     const skippedHabit = progressData[skippedHabitId]?.habitName || "N/A";
-  
-    // Ratio-based day analysis
+
+    // Day-wise ratio analysis
     const allDays = new Set([...Object.keys(dayCompletion), ...Object.keys(daySkipped)]);
     const dayRatios = {};
-  
+
     allDays.forEach((day) => {
       const completed = dayCompletion[day] || 0;
       const skipped = daySkipped[day] || 0;
       const total = completed + skipped;
       dayRatios[day] = total > 0 ? completed / total : 0;
     });
-  
-    const topDay = Object.entries(dayRatios).sort(([, a], [, b]) => b - a)[0]?.[0] || "N/A";
-    const skipDay = Object.entries(dayRatios).sort(([, a], [, b]) => a - b)[0]?.[0] || "N/A";
-  
+
+    const sortedDayRatios = Object.entries(dayRatios).sort(([, a], [, b]) => b - a);
+    const topDay = sortedDayRatios[0]?.[0] || "N/A";
+    const skipDay = sortedDayRatios[sortedDayRatios.length - 1]?.[0] || "N/A";
+
     setMostConsistent(consistentHabit);
     setMostSkipped(skippedHabit);
     setProductiveDay(topDay);
     setSkippedDay(skipDay);
   }, [progressData]);
-  
 
   return (
     <div className="insights-stats">

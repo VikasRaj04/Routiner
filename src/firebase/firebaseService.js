@@ -1,4 +1,4 @@
-import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, getDocs,
   addDoc,
@@ -34,14 +34,14 @@ export const getUserInfo = () => {
         }
 
         // 🆕 Naya Anonymous User Create Karo
-        try {
-          const cred = await signInAnonymously(auth);
-          localStorage.setItem("anonymousUID", cred.user.uid); // 🔥 Store UID
-          resolve({ uid: cred.user.uid, email: null, name: "Guest User" });
-        } catch (error) {
-          console.error("Error signing in anonymously:", error);
-          reject("Anonymous login failed");
-        }
+        // try {
+        //   const cred = await signInAnonymously(auth);
+        //   localStorage.setItem("anonymousUID", cred.user.uid); // 🔥 Store UID
+        //   resolve({ uid: cred.user.uid, email: null, name: "Guest User" });
+        // } catch (error) {
+        //   console.error("Error signing in anonymously:", error);
+        //   reject("Anonymous login failed");
+        // }
       }
     });
   });
@@ -68,6 +68,8 @@ export const fetchHabits = async (userID) => {
         habits.push({ id: doc.id, ...doc.data() });
       });
 
+
+
       return Array.isArray(habits) ? habits : [];
     } catch (error) {
       console.error("Error fetching habits:", error);
@@ -76,27 +78,24 @@ export const fetchHabits = async (userID) => {
   }
 };
 
-
 // 3. Add Habit
 export const addHabit = async (userID, habitData) => {
+
   const storedUID = localStorage.getItem("anonymousUID");
   const isAnonymous = userID === storedUID;
 
-
   if (isAnonymous) {
     let storedHabits = JSON.parse(localStorage.getItem("anonymousHabits")) || [];
-
     const newHabit = { id: Date.now().toString(), ...habitData };
     storedHabits.push(newHabit);
     localStorage.setItem("anonymousHabits", JSON.stringify(storedHabits));
-
     return newHabit;
   } else {
     try {
       const newHabitRef = doc(collection(db, `users/${userID}/habits`));
       await setDoc(newHabitRef, habitData);
-      const habitId = null;
-      await addHistoryEntry(userID, "Created",habitId, habitData.habitName);
+      const habitId = newHabitRef.id; // Get the actual habit ID from Firestore
+      await addHistoryEntry(userID, "Created", habitId, habitData.name); // Ensure habitName is passed properly
       return { id: newHabitRef.id, ...habitData };
     } catch (error) {
       console.error("❌ Error adding habit:", error);
@@ -104,6 +103,7 @@ export const addHabit = async (userID, habitData) => {
     }
   }
 };
+
 
 
 
@@ -123,7 +123,6 @@ export const deleteHabit = async (userID, habitID, habitName) => {
       // ✅ Local Storage update karo
       localStorage.setItem("anonymousHabits", JSON.stringify(updatedHabits));
 
-      console.log(`Anonymous habit deleted: ${habitName}`);
     } else {
       // ✅ Firebase User Ke Liye Database Se Delete Karo
       await deleteDoc(doc(db, `users/${userID}/habits/${habitID}`));
@@ -183,9 +182,12 @@ export const updateHabit = async (userID, habitID, updatedData, oldData) => {
 
 
 
-// ✅ Function to Add History Entry
+// 6 Function to Add History Entry
 export const addHistoryEntry = async (userId, action, habitId, habitName, changes = null) => {
-  if (!userId || !habitId || !action) return;
+  if (!userId || !habitId || !action || !habitName) {
+    console.error("❌ Missing required fields:", { userId, action, habitId, habitName });
+    return;
+  }
 
   try {
     const historyRef = collection(db, `users/${userId}/history`);
@@ -206,13 +208,17 @@ export const addHistoryEntry = async (userId, action, habitId, habitName, change
 
 
 
-// Progress Page Functions
+
+
+// 7 Progress Page Functions
 export const fetchProgressData = async (userId) => {
   try {
     const progressRef = collection(db, "users", userId, "progress");
     const snapshot = await getDocs(progressRef);
 
     let progressData = {};
+    let allCompleted = 0; // Cumulative completed ticks for all habits
+    let allPossible = 0;  // Cumulative possible ticks for all habits
 
     snapshot.forEach((doc) => {
       const data = doc.data();
@@ -258,19 +264,33 @@ export const fetchProgressData = async (userId) => {
         maxStreak,
         category,
       };
+
+      // Track overall completion data for calculating global completion rates
+      allCompleted += totalCompleted;
+      allPossible += totalPossible;
     });
 
-    return { progressData };
+    // Calculate daily average completion rate
+    const dailyAverageCompletion = allPossible ? (allCompleted / allPossible) * 100 : 0;
+
+    // Calculate all-time average completion rate
+    const allTimeCompletionRate = allPossible ? (allCompleted / allPossible) * 100 : 0;
+
+    return {
+      progressData,
+      dailyAverageCompletion: Math.round(dailyAverageCompletion),
+      allTimeCompletionRate: Math.round(allTimeCompletionRate),
+    };
   } catch (error) {
     console.error("❌ Error fetching progress data:", error);
-    return { progressData: {} };
+    return { progressData: {}, dailyAverageCompletion: 0, allTimeCompletionRate: 0 };
   }
 };
 
 
 
-// Add Habit Progresss
 
+// 8 Add Habit Progresss
 export const addHabitProgress = async (userId, habitId, date, index, timesPerDay, habitName, category) => {
   try {
     const progressRef = doc(db, "users", userId, "progress", habitId);
@@ -280,9 +300,11 @@ export const addHabitProgress = async (userId, habitId, date, index, timesPerDay
     let timestamp = habitData.timestamp || new Date().toISOString();
     let completion = habitData.completion || {};
     let streaks = habitData.streaks || 0;
+    let longestStreak = habitData.longestStreak || 0;
     let totalCompleted = habitData.totalCompleted || 0;
     let totalDaysTracked = habitData.totalDaysTracked || 0;
 
+    // Ensure that completion exists for the current date
     if (!completion[date] || !Array.isArray(completion[date]?.ticks)) {
       completion[date] = {
         ticks: new Array(timesPerDay).fill(false),
@@ -303,12 +325,17 @@ export const addHabitProgress = async (userId, habitId, date, index, timesPerDay
       return;
     }
 
+    // Calculate daily completion (percentage of ticks completed)
     const completedToday = dayEntry.ticks.filter(Boolean).length;
     dayEntry.completion = (completedToday / timesPerDay) * 100;
 
-    const totalPossible = totalDaysTracked * timesPerDay;
-    const completionRate = totalPossible > 0 ? (totalCompleted / totalPossible) * 100 : 0;
+    // Calculate overall completion rate based on all days from habit registration to the current date
+    const allCompletionData = Object.values(completion);
+    const totalTicks = allCompletionData.reduce((acc, day) => acc + day.ticks.length, 0);
+    const completedTicks = allCompletionData.reduce((acc, day) => acc + day.ticks.filter(Boolean).length, 0);
+    const completionRate = totalTicks > 0 ? (completedTicks / totalTicks) * 100 : 0;
 
+    // Streaks: Check if the current streak is greater than the longest streak
     const previousDate = new Date(date);
     previousDate.setDate(previousDate.getDate() - 1);
     const prevDateStr = previousDate.toISOString().split("T")[0];
@@ -316,32 +343,80 @@ export const addHabitProgress = async (userId, habitId, date, index, timesPerDay
     if (completion[prevDateStr]?.ticks?.every(Boolean)) {
       streaks += 1;
     } else {
-      streaks = 1;
+      streaks = 1;  // Reset streak on a missed day
     }
 
+    // Update longest streak
+    if (streaks > longestStreak) {
+      longestStreak = streaks;
+    }
+
+    // Save the updated habit data to Firestore
     await setDoc(progressRef, {
       ...habitData,
       habitName,
-      category, // ✅ category added
+      category,
       timestamp,
       completion,
       streaks,
+      longestStreak,
       totalCompleted,
       totalDaysTracked,
       completionRate,
     }, { merge: true });
 
+    // Update overall global completion rate for all habits (you can update this globally for the user)
+    await updateGlobalCompletionRate(userId);
 
   } catch (error) {
-    console.error("❌ Error updating progress:", error);
+    console.error("❌ Error updating habit progress:", error);
+  }
+};
+
+// Helper function to update global completion rate (called when a habit progress is added)
+const updateGlobalCompletionRate = async (userId) => {
+  try {
+    const progressRef = collection(db, "users", userId, "progress");
+    const snapshot = await getDocs(progressRef);
+
+    let allCompleted = 0;
+    let allPossible = 0;
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const completion = data.completion || {};
+      let totalCompleted = 0;
+      let totalPossible = 0;
+
+      Object.keys(completion).forEach((dateStr) => {
+        const dayEntry = completion[dateStr];
+        if (dayEntry && Array.isArray(dayEntry.ticks)) {
+          const ticks = dayEntry.ticks;
+          totalPossible += ticks.length;
+          const completedCount = ticks.filter(Boolean).length;
+          totalCompleted += completedCount;
+        }
+      });
+
+      allCompleted += totalCompleted;
+      allPossible += totalPossible;
+    });
+
+    const globalCompletionRate = allPossible ? (allCompleted / allPossible) * 100 : 0;
+
+    // Save this global rate in Firestore under user record
+    const userRef = doc(db, "users", userId);
+    await setDoc(userRef, { globalCompletionRate }, { merge: true });
+
+  } catch (error) {
+    console.error("❌ Error updating global completion rate:", error);
   }
 };
 
 
 
 
-
-// ✅ Function to delete habit and its progress
+// 9 Function to delete habit and its progress
 export const deleteHabitWithProgress = async (userId, habitId) => {
   try {
     const habitRef = doc(db, "users", userId, "habits", habitId);
@@ -363,9 +438,6 @@ export const deleteHabitWithProgress = async (userId, habitId) => {
       }
     });
 
-    if (deletedProgress.length === 0) {
-      console.warn("⚠️ No matching progress doc found to delete with ID:", habitId);
-    }
 
     // Step 2: Archive in `deletedData`
     const deletedRef = doc(db, "users", userId, "deletedData", habitId);
@@ -393,7 +465,7 @@ export const deleteHabitWithProgress = async (userId, habitId) => {
 
 
 
-// ✅ Calculate and Store Daily Completion Rate
+// 10 Calculate and Store Daily Completion Rate
 export const calculateAndStoreDailyCompletionRate = async (userId, date) => {
   try {
     const progressRef = collection(db, "users", userId, "progress");
@@ -433,7 +505,7 @@ export const calculateAndStoreDailyCompletionRate = async (userId, date) => {
 
 
 
-// ADD NOTE
+// 11 ADD NOTE
 
 export const addNoteToDate = async (userId, date, noteText) => {
   const noteData = {
@@ -444,7 +516,6 @@ export const addNoteToDate = async (userId, date, noteText) => {
 
   try {
     await addDoc(collection(db, 'users', userId, 'notes'), noteData);
-    console.log('Note added to Firebase!');
   } catch (err) {
     console.error('Error adding note:', err);
   }
@@ -452,10 +523,10 @@ export const addNoteToDate = async (userId, date, noteText) => {
 
 
 
-// Fetch NOTES DATA
+// 12 Fetch NOTES DATA
 
 export const fetchNotes = async (userId) => {
-  const notesCollection = collection(db, "users", userId, "notes");  
+  const notesCollection = collection(db, "users", userId, "notes");
   const notesSnapshot = await getDocs(notesCollection);
   const notesList = notesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   return notesList;
@@ -468,8 +539,8 @@ export const fetchNotes = async (userId) => {
 export const modifyNote = async (userId, noteId, newNoteText) => {
   const noteRef = doc(db, "users", userId, "notes", noteId);
   await updateDoc(noteRef, {
-      note: newNoteText,
-      lastModified: new Date() // Optional: Track when it was modified
+    note: newNoteText,
+    lastModified: new Date() // Optional: Track when it was modified
   });
 };
 

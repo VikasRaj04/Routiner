@@ -1,97 +1,96 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchUserHabits } from "../../store/slices/habitSlice";
-import {
-    fetchProgressData,
-    addHabitProgress,
-} from "../../firebase/firebaseService";
+import { fetchProgressData, addHabitProgress } from "../../firebase/firebaseService";
 import { unlockBadges } from "../../utils/unlockBadges";
 
 const TrackProgress = () => {
     const dispatch = useDispatch();
     const { habits, loading } = useSelector((state) => state.habits);
     const currentUser = useSelector((state) => state.auth.user);
+    const userId = useSelector(state => state.auth.userId);
     const [dates, setDates] = useState([]);
     const [progressData, setProgressData] = useState({});
 
+    // Generate current week dates
     useEffect(() => {
-        dispatch(fetchUserHabits());
+        dispatch(fetchUserHabits(userId));
 
-        const generateDates = () => {
-            const today = new Date();
-            const daysArray = Array.from({ length: 7 }, (_, i) => {
-                const newDate = new Date();
-                newDate.setDate(today.getDate() + i - 4);
-                return {
-                    dateStr: newDate.toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                    }),
-                    date: newDate.toISOString().split("T")[0],
-                    isToday: i === 4,
-                    isPast: i < 4,
-                    isFuture: i > 4,
-                };
-            });
-            setDates(daysArray);
-        };
+        const today = new Date();
+        const daysArray = Array.from({ length: 7 }, (_, i) => {
+            const newDate = new Date();
+            newDate.setDate(today.getDate() + i - 4);
+            return {
+                dateStr: newDate.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                }),
+                date: newDate.toISOString().split("T")[0],
+                isToday: i === 4,
+                isPast: i < 4,
+                isFuture: i > 4,
+            };
+        });
+        setDates(daysArray);
+    }, [dispatch, userId]);
 
-        generateDates();
-
+    // Load progress data from Firebase (or localStorage as fallback)
+    useEffect(() => {
         if (currentUser) {
+            const cached = localStorage.getItem(`${currentUser.uid}-progress`);
+            if (cached) {
+                setProgressData(JSON.parse(cached));
+            }
+
             fetchProgressData(currentUser.uid).then((data) => {
-                setProgressData(data.progressData || {});
+                const freshData = data.progressData || {};
+                setProgressData(freshData);
+                localStorage.setItem(`${currentUser.uid}-progress`, JSON.stringify(freshData));
             });
         }
-    }, [dispatch, currentUser]);
+    }, [currentUser]);
 
+    // Handle habit checkbox interaction
     const handleCheckboxChange = useCallback(
         async (habitId, date, index, timesPerDay, habitName, category) => {
             if (!currentUser) return;
 
-            setProgressData((prev) => ({
-                ...prev,
-                [habitId]: {
-                    ...prev[habitId],
-                    completion: {
-                        ...prev[habitId]?.completion,
-                        [date]: {
-                            ticks:
-                                prev[habitId]?.completion?.[date]?.ticks?.length === timesPerDay
-                                    ? prev[habitId].completion[date].ticks.map((v, i) =>
-                                          i === index ? true : v
-                                      )
-                                    : new Array(timesPerDay)
-                                          .fill(false)
-                                          .map((_, i) => (i === index ? true : false)),
+            // Optimistically update UI
+            setProgressData((prev) => {
+                const prevTicks = prev[habitId]?.completion?.[date]?.ticks || new Array(timesPerDay).fill(false);
+                const newTicks = [...prevTicks];
+                newTicks[index] = true;
+
+                const updated = {
+                    ...prev,
+                    [habitId]: {
+                        ...prev[habitId],
+                        completion: {
+                            ...prev[habitId]?.completion,
+                            [date]: {
+                                ticks: newTicks,
+                            },
                         },
                     },
-                },
-            }));
+                };
+
+                // Persist to localStorage
+                localStorage.setItem(`${currentUser.uid}-progress`, JSON.stringify(updated));
+                return updated;
+            });
 
             try {
-                await addHabitProgress(
-                    currentUser.uid,
-                    habitId,
-                    date,
-                    index,
-                    timesPerDay,
-                    habitName,
-                    category
-                );
+                await addHabitProgress(currentUser.uid, habitId, date, index, timesPerDay, habitName, category);
 
-                // 🏆 Badge unlock check
-                const userHabits = habits;
-
+                // Check for badge unlocks
                 const todayCompletedHabits = habits.filter((habit) => {
-                    const ticks =
-                        progressData[habit.id]?.completion?.[date]?.ticks || [];
+                    const ticks = progressData[habit.id]?.completion?.[date]?.ticks || [];
                     return ticks.every(Boolean);
                 });
 
                 const newBadges = await unlockBadges({
                     userId: currentUser.uid,
-                    userHabits,
+                    userHabits: habits,
                     todayCompletedHabits,
                     todayAllHabits: habits,
                     currentDate: new Date(date),
@@ -99,7 +98,7 @@ const TrackProgress = () => {
 
                 if (newBadges.length > 0) {
                     console.log("🎉 New badges unlocked:", newBadges);
-                    // 🥳 Optionally: toast, confetti, etc.
+                    // You can add a toast/notification here
                 }
             } catch (error) {
                 console.error("Error updating progress or unlocking badges:", error);
@@ -107,6 +106,16 @@ const TrackProgress = () => {
         },
         [currentUser, habits, progressData]
     );
+
+    // Memoize filtered habits to avoid unnecessary recalculations
+    const filteredHabits = useMemo(() => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return habits.filter((habit) => {
+            const startDate = habit.startDate ? new Date(habit.startDate) : null;
+            return !startDate || startDate <= today;
+        });
+    }, [habits]);
 
     if (loading) return <p>Loading habits...</p>;
 
@@ -135,71 +144,50 @@ const TrackProgress = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {habits
-                            .filter((habit) => {
-                                // ✅ Allow if startDate is missing/empty/null
-                                if (!habit.startDate || habit.startDate === "" || habit.startDate === null) {
-                                    return true;
-                                }
+                        {filteredHabits.map((habit) => {
+                            const timesPerDay = parseInt(habit.frequency.split("/")[0], 10);
 
-                                const today = new Date();
-                                today.setHours(0, 0, 0, 0);
+                            return (
+                                <tr key={habit.id}>
+                                    <td className="habit-name">
+                                        {habit.name} ({habit.frequency})
+                                    </td>
+                                    {dates.map((dateObj, index) => {
+                                        const completionArray =
+                                            progressData[habit.id]?.completion?.[dateObj.date]?.ticks ||
+                                            new Array(timesPerDay).fill(false);
 
-                                const startDateObj = new Date(habit.startDate);
-                                startDateObj.setHours(0, 0, 0, 0);
-
-                                // ❌ Exclude future startDate
-                                return startDateObj <= today;
-                            })
-                            .map((habit) => {
-                                const timesPerDay = parseInt(habit.frequency.split("/")[0], 10);
-
-                                return (
-                                    <tr key={habit.id}>
-                                        <td className="habit-name">
-                                            {habit.name} ({habit.frequency})
-                                        </td>
-                                        {dates.map((dateObj, index) => {
-                                            const completionArray =
-                                                progressData[habit.id]?.completion?.[dateObj.date]?.ticks ||
-                                                new Array(timesPerDay).fill(false);
-
-                                            return (
-                                                <td key={index} className="habit-cell">
-                                                    {completionArray
-                                                        .slice(0, timesPerDay)
-                                                        .map((completed, idx) =>
-                                                            dateObj.isPast ? (
-                                                                <span
-                                                                    key={idx}
-                                                                    className={completed ? "tick" : "cross"}
-                                                                ></span>
-                                                            ) : (
-                                                                <input
-                                                                    key={idx}
-                                                                    type="checkbox"
-                                                                    checked={completed}
-                                                                    disabled={dateObj.isFuture}
-                                                                    onChange={() =>
-                                                                        handleCheckboxChange(
-                                                                            habit.id,
-                                                                            dateObj.date,
-                                                                            idx,
-                                                                            timesPerDay,
-                                                                            habit.name,
-                                                                            habit.category
-                                                                        )
-                                                                    }
-                                                                    className="checkbox"
-                                                                />
-                                                            )
-                                                        )}
-                                                </td>
-                                            );
-                                        })}
-                                    </tr>
-                                );
-                            })}
+                                        return (
+                                            <td key={index} className="habit-cell">
+                                                {completionArray.map((completed, idx) =>
+                                                    dateObj.isPast ? (
+                                                        <span key={idx} className={completed ? "tick" : "cross"} />
+                                                    ) : (
+                                                        <input
+                                                            key={idx}
+                                                            type="checkbox"
+                                                            checked={completed}
+                                                            disabled={dateObj.isFuture}
+                                                            onChange={() =>
+                                                                handleCheckboxChange(
+                                                                    habit.id,
+                                                                    dateObj.date,
+                                                                    idx,
+                                                                    timesPerDay,
+                                                                    habit.name,
+                                                                    habit.category
+                                                                )
+                                                            }
+                                                            className="checkbox"
+                                                        />
+                                                    )
+                                                )}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence, makeUseVisualState } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     BarChart,
     Bar,
@@ -15,7 +15,6 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProgress, selectProgressData } from "../../store/slices/ProgressSlice";
 import { fetchUserHabits } from "../../store/slices/habitSlice";
-import Button from "../Button";
 import AddHabitModal from "../Habits/AddHabit";
 import NoteModal from "./NoteModal";
 
@@ -74,17 +73,18 @@ const DateModal = ({ isOpen, onClose, selectedDate }) => {
     const dispatch = useDispatch();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isNoteOpen, setIsNoteOpen] = useState(false);
-
+    
     const userId = useSelector((state) => state.auth.userId);
     const progress = useSelector(selectProgressData);
     const habits = useSelector((state) => state.habits.habits) || [];
     const totalHabits = useSelector((state) => state.habits.totalHabits) || [];
-
+    
+    // Fetch data once on component mount or when userId changes
     useEffect(() => {
         dispatch(fetchProgress(userId));
         dispatch(fetchUserHabits(userId));
     }, [dispatch, userId]);
-
+    
     useEffect(() => {
         const handleEsc = (e) => {
             if (e.key === "Escape") onClose();
@@ -92,68 +92,65 @@ const DateModal = ({ isOpen, onClose, selectedDate }) => {
         window.addEventListener("keydown", handleEsc);
         return () => window.removeEventListener("keydown", handleEsc);
     }, [onClose]);
-
+    
     const handleClickOutside = (e) => {
         if (e.target.classList.contains("modal-backdrop")) {
             onClose();
         }
     };
-
+    
+    // UseMemo for formattedDate — only changes when selectedDate changes
     const formattedDate = useMemo(() => {
         if (selectedDate) {
             const localDate = new Date(selectedDate);
-            // Local date with YYYY-MM-DD format
-            return localDate.toLocaleDateString('en-CA'); // 'en-CA' is equivalent to 'YYYY-MM-DD'
+            return localDate.toLocaleDateString('en-CA');
         }
         return '';
     }, [selectedDate]);
-
-
-    const combinedData = useMemo(() => {
-        return habits.map((habit) => {
-            const habitProgress = progress?.[habit.id];
-            const completionData = habitProgress?.completion?.[formattedDate];
-
-            // If there's no progress data, set `hasProgress` to false and `completed` to false
-            if (!completionData) {
-                return {
-                    id: habit.id,
-                    name: habit.name,
-                    category: habit.category || "Uncategorized",
-                    frequency: habit.frequency || "N/A",
-                    maxStreak: "N/A",
-                    averageCompletion: 0,
-                    completed: false,  // Mark as not completed if there's no progress data
-                    hasProgress: false,
-                    completionPercent: 0,
-                };
-            }
-
-            const totalTicks = completionData?.ticks?.length || 0;
-            const completedTicks = completionData?.ticks?.filter(tick => tick === true).length || 0;
-            const completionPercentage = totalTicks > 0 ? (completedTicks / totalTicks) * 100 : 0;
-            const completed = completedTicks === totalTicks;
-
+    
+    // Calculating combinedData directly without useMemo
+    const combinedData = habits.map((habit) => {
+        const habitProgress = progress?.[habit.id];
+        const completionData = habitProgress?.completion?.[formattedDate];
+    
+        if (!completionData) {
             return {
                 id: habit.id,
                 name: habit.name,
                 category: habit.category || "Uncategorized",
                 frequency: habit.frequency || "N/A",
-                maxStreak: habitProgress?.maxStreak ?? "N/A",
-                averageCompletion: completionPercentage ?? 0,
-                completed,  // Mark as completed only if `completedTicks === totalTicks`
-                hasProgress: !!completionData,
-                completionPercent: completionPercentage,
+                maxStreak: "N/A",
+                averageCompletion: 0,
+                completed: false,
+                hasProgress: false,
+                completionPercent: 0,
             };
-        });
-    }, [habits, progress, formattedDate]);
-
-
+        }
+    
+        const totalTicks = completionData?.ticks?.length || 0;
+        const completedTicks = completionData?.ticks?.filter(tick => tick === true).length || 0;
+        const completionPercentage = totalTicks > 0 ? (completedTicks / totalTicks) * 100 : 0;
+        const completed = completedTicks === totalTicks;
+    
+        return {
+            id: habit.id,
+            name: habit.name,
+            category: habit.category || "Uncategorized",
+            frequency: habit.frequency || "N/A",
+            maxStreak: habitProgress?.maxStreak ?? "N/A",
+            averageCompletion: completionPercentage ?? 0,
+            completed,
+            hasProgress: !!completionData,
+            completionPercent: completionPercentage,
+        };
+    });
+    
+    // Chart data
     const barChartData = combinedData.map((habit) => ({
         name: habit.name,
         progress: habit.completionPercent,
     }));
-
+    
     const pieChartData = [
         {
             name: "Completed",
@@ -164,10 +161,7 @@ const DateModal = ({ isOpen, onClose, selectedDate }) => {
             value: combinedData.filter((h) => !h.completed).length,
         },
     ];
-
-
-
-
+    
 
 
     return (
@@ -331,14 +325,14 @@ const DateModal = ({ isOpen, onClose, selectedDate }) => {
 
                                 <div className="holo-card holo-card-top">
                                     <h3 className="holo-title">🌀 Circular Progress</h3>
-                                    <ResponsiveContainer width="100%" height={180}>
+                                    <ResponsiveContainer >
                                         <PieChart>
                                             <Pie
                                                 data={pieChartData}
                                                 cx="50%"
                                                 cy="50%"
-                                                innerRadius={50}
-                                                outerRadius={80}
+                                                innerRadius={30}
+                                                outerRadius={70}
                                                 fill="#8884d8"
                                                 paddingAngle={5}
                                                 dataKey="value"
@@ -376,7 +370,7 @@ const DateModal = ({ isOpen, onClose, selectedDate }) => {
 
                                 <div className="holo-card holo-card-bottom">
                                     <h3 className="holo-title">📊 Bar Progress</h3>
-                                    <ResponsiveContainer width="90%" height={220}>
+                                    <ResponsiveContainer >
                                         <BarChart data={barChartData}>
                                             <CartesianGrid strokeDasharray="2 5" />
                                             <XAxis dataKey="name" />
@@ -411,9 +405,7 @@ const DateModal = ({ isOpen, onClose, selectedDate }) => {
 
 
 
-                        <div className="modal-footer glow-text">
-                            ⚡ System Log: {combinedData.length ? "Mission scanned and logged." : "No data found for selected date."}
-                        </div>
+                        
                     </motion.div>
                 </motion.div>
             )}

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-// import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
-
-function KeyFeatures() {
+const KeyFeatures = () => {
     const [activeIndex, setActiveIndex] = useState(null);
 
     const features = [
@@ -55,7 +53,7 @@ function KeyFeatures() {
 
     const toggleAccordion = (index) => {
         setActiveIndex(activeIndex === index ? null : index);
-    }
+    };
 
     return (
         <section className="key-features">
@@ -63,20 +61,15 @@ function KeyFeatures() {
 
             <div className="features">
                 {features.map((feature, index) => (
-                    <div key={feature.id} className='accordion-item'>
-                        <h4 className="accordion-header"
-                            onClick={() => toggleAccordion(index)}
-                        >
+                    <div key={feature.id} className="accordion-item">
+                        <h4 className="accordion-header" onClick={() => toggleAccordion(index)}>
                             {feature.title}
                             <span className={`accordion-icon ${activeIndex === index ? "rotate" : ""}`}>
-                                <i class="fa-solid fa-angle-down"></i>
+                                <i className="fa-solid fa-angle-down"></i>
                             </span>
                         </h4>
 
-                        <div
-                            className={`accordion-content ${activeIndex === index ? "open" : ""
-                                }`}
-                        >
+                        <div className={`accordion-content ${activeIndex === index ? "open" : ""}`}>
                             {activeIndex === index && <p>{feature.content}</p>}
                         </div>
                     </div>

@@ -1,4 +1,11 @@
+/* ==========================
+   Profile Page Styles
+========================== */
+
 .profile-container {
+  position: relative;
+  top: 80px;
+  bottom: 20px;
   max-width: 600px;
   margin: 0 auto;
   padding: 2rem;
@@ -6,6 +13,8 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   font-family: Arial, sans-serif;
+  width: 100%;
+  height: 100vh;
 }
 
 .profile-header {
@@ -19,11 +28,11 @@
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 1rem;
-  border: 3px solid #3843ff;
+  border: 3px solid var(--primary-blue-100);
 }
 
-.user-name{
-    color: var(--primary-blue-100);
+.user-name {
+  color: var(--primary-blue-100);
 }
 
 .email {
@@ -51,13 +60,196 @@
   display: block;
   margin: 2rem auto 0;
   background: #ff4d4f;
-  color: white;
+  color: #fff;
   padding: 0.8rem 1.5rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
 }
 
 .logout-btn:hover {
   background: #e63946;
+}
+
+/* ==========================
+   Auth Page Styles (Login, Signup, etc.)
+========================== */
+
+.auth-container {
+  width: 60%;
+  margin: 72px auto;
+  padding: 34px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: inset 1px 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+.auth-heading {
+  font-size: 1.7rem;
+  margin-bottom: 2rem;
+}
+
+.auth-container form {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: left;
+  padding: 3rem;
+}
+
+.auth-container label {
+  font-size: 0.875rem;
+  font-weight: bold;
+}
+
+.auth-container input {
+  outline: none;
+  width: 100%;
+  padding: 12px 4px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 5px;
+  box-shadow: inset 0px 0px 6px rgba(0, 0, 0, 0.4);
+}
+
+.auth-container .email,
+.auth-container .password {
+  position: relative;
+}
+
+.auth-container svg {
+  position: absolute;
+  top: 70%;
+  right: 15px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.auth-container .forgot {
+  font-size: 0.875rem;
+  margin-top: -6px;
+  text-align: right;
+}
+
+.auth-container .forgot a {
+  text-decoration: none;
+  color: #636363;
+}
+
+.auth-container .forgot a:hover {
+  text-decoration: underline;
+}
+
+.auth-container .account {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 16px 0;
+}
+
+.auth-container .account a {
+  text-decoration: none;
+  color: var(--primary-blue-100);
+}
+
+.auth-container .account a:hover {
+  text-decoration: underline;
+}
+
+.auth-container button {
+  background: var(--primary-blue-100);
+  color: #fff;
+  font-size: 0.9rem;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.auth-container button:hover {
+  background: var(--primary-blue-80);
+}
+
+.auth-container .gender {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-container .gender label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.auth-container .gender input {
+  margin: 0;
+  box-shadow: none;
+}
+
+/* ==========================
+   Feedback Messages
+========================== */
+
+.error {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 5px;
+  text-align: center;
+}
+
+.success {
+  color: green;
+  font-size: 0.875rem;
+  margin-top: 5px;
+  text-align: center;
+}
+
+
+@media (max-width: 1024px) {
+  .auth-container{
+    width: 70%;
+  }
+
+  .auth-container form{
+    width: 80%;
+    padding: 2.5rem;
+  }
+}
+
+@media (max-width: 769px){
+  .auth-container{
+    width: 80%;
+    margin: 42px auto;
+  }
+
+  .auth-container form{
+    padding: 2rem;
+    width: 90%;
+  }
+}
+
+@media (max-width: 480px){
+  .auth-container{
+    width: 90%;
+    margin: 24px auto;
+  }
+
+  .auth-heading{
+    margin-bottom: 0;
+  }
+
+  .auth-container form{
+    padding: 1.8rem;
+    width: 100%;
+  }
 }

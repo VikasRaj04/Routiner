@@ -1,5 +1,5 @@
 import { db } from "../firebase/firebase";
-import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 
 /**
  * 📝 Habit progress ko store/update karega Firebase me.
@@ -44,24 +44,16 @@ export const getHabitProgress = async (userId, habitId) => {
 
     try {
         const progressSnap = await getDoc(progressRef);
-        if (progressSnap.exists()) {
-            return progressSnap.data();
-        } else {
-            return {};
-        }
+        return progressSnap.exists() ? progressSnap.data() : {};
     } catch (error) {
         console.error("❌ Error fetching habit progress:", error);
         return {};
     }
 };
 
-
-
 // utils/dailygraph formatting data
-
 export const formatDailyGraphData = (progressData) => {
     const dateTotals = {};
-
     const today = new Date();
     const last10Dates = [];
 
@@ -75,7 +67,6 @@ export const formatDailyGraphData = (progressData) => {
 
     for (const habitId in progressData) {
         const completion = progressData[habitId].completion;
-
         if (!completion) continue;
 
         for (const date in completion) {
@@ -92,16 +83,12 @@ export const formatDailyGraphData = (progressData) => {
         }
     }
 
-    const graphData = last10Dates.map((date) => {
+    return last10Dates.map((date) => {
         const { completed, total } = dateTotals[date];
-        const progress =
-            total > 0 ? parseFloat(((completed / total) * 100).toFixed(1)) : 0;
+        const progress = total > 0 ? parseFloat(((completed / total) * 100).toFixed(1)) : 0;
         return { date, progress };
     });
-
-    return graphData;
 };
-
 
 // Weekly Graph
 export const formatWeeklyGraphData = (progressData) => {
@@ -111,7 +98,6 @@ export const formatWeeklyGraphData = (progressData) => {
     }
 
     const dateTotals = {};
-
     const today = new Date();
     const currentDay = today.getDay(); // 0 (Sun) to 6 (Sat)
 
@@ -131,70 +117,45 @@ export const formatWeeklyGraphData = (progressData) => {
         dateTotals[dateStr] = { completed: 0, total: 0 };
     }
 
-
     // STEP 3: Loop through progress data
     for (const habitId in progressData) {
-        const habit = progressData[habitId];
-        const completion = habit?.completion;
-
-
-        if (!completion || typeof completion !== "object") continue;
+        const completion = progressData[habitId]?.completion;
+        if (!completion) continue;
 
         for (const date in completion) {
             if (!weeklyDates.includes(date)) continue;
 
-            const entry = completion[date];
-            const ticks = Array.isArray(entry) ? entry : entry?.ticks;
-
-            if (!Array.isArray(ticks)) {
-                console.warn("Invalid ticks on", date, "in habit", habitId, "->", entry);
-                continue;
-            }
+            const ticks = Array.isArray(completion[date]?.ticks) ? completion[date].ticks : [];
+            if (!ticks.length) continue;
 
             const completed = ticks.filter(Boolean).length;
             const total = ticks.length;
 
             dateTotals[date].completed += completed;
             dateTotals[date].total += total;
-
         }
     }
 
     // STEP 4: Prepare Graph Data
-    const graphData = weeklyDates.map((dateStr) => {
+    return weeklyDates.map((dateStr) => {
         const { completed, total } = dateTotals[dateStr];
         const progress = total > 0 ? parseFloat(((completed / total) * 100).toFixed(1)) : 0;
 
-        const dateObj = new Date(dateStr);
         const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        const day = dayNames[dateObj.getDay()];
+        const day = dayNames[new Date(dateStr).getDay()];
 
         return { date: dateStr, day, progress };
     });
-
-    return graphData;
 };
 
-
-
 // Category Chart
-
 export const formatCategoryGraph = (habits) => {
     const categoryCount = {};
 
     for (const habitId in habits) {
         const category = habits[habitId].category || "Uncategorized";
-
-        if (!categoryCount[category]) {
-            categoryCount[category] = 0;
-        }
-
-        categoryCount[category] += 1;
+        categoryCount[category] = (categoryCount[category] || 0) + 1;
     }
 
-    // Convert to array for Pie Chart
-    return Object.entries(categoryCount).map(([name, value]) => ({
-        name,
-        value,
-    }));
+    return Object.entries(categoryCount).map(([name, value]) => ({ name, value }));
 };

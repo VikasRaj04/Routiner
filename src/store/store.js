@@ -8,15 +8,21 @@ import progressReducer from './slices/ProgressSlice';
 import badgeReducer from './slices/BadgeSlice';
 
 const store = configureStore({
-    reducer: {
-        heroCarouselData: heroCarouselReducer,
-        dashboard: dashboardReducer,
-        auth: authReducer,
-        habits: habitReducer,
-        history: historyReducer,
-        progress: progressReducer,
-        badge: badgeReducer,
-    },
+  reducer: {
+    heroCarouselData: heroCarouselReducer,
+    dashboard: dashboardReducer,
+    auth: authReducer,
+    habits: habitReducer,
+    history: historyReducer,
+    progress: progressReducer,
+    badge: badgeReducer,
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredPaths: ['history.historyList.timestamp'], // Ignore the `timestamp` field in the `history` slice
+      },
+    }),
 });
 
 export default store;

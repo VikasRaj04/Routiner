@@ -1,67 +1,100 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHistory } from "../store/slices/historySlice";
 import { selectUserId } from "../store/slices/AuthSlice";
-import "./styles/History.css";
 import { LifetimeHistory, Sidebar, StreaklyHistory } from "../components";
+import "./styles/History.css";
+import Topbar from "../utils/Topbar";
+
 
 const History = () => {
     const dispatch = useDispatch();
     const { historyList, loading, error } = useSelector((state) => state.history);
     const userId = useSelector(selectUserId);
-    const isGuest = !userId; // ✅ Fix: Guest ko userId se check karna
+    const isGuest = !userId;
 
-    const [activeTab, setActiveTab] = useState("Daily"); // Default: Daily
+    const [activeTab, setActiveTab] = useState("Daily");
+
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    
+    const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     useEffect(() => {
-        dispatch(fetchHistory(userId));
+        if (userId) {
+            dispatch(fetchHistory(userId));
+        }
     }, [dispatch, userId]);
 
     // 🟢 Tab Change Handler
     const handleTabChange = (tab) => {
-        if (isGuest && (tab === "Weekly" || tab === "Streakly" || tab === "Lifetime")) {
+        if (isGuest && ["Weekly", "Streakly", "Lifetime"].includes(tab)) {
             alert("🔒 Please login to access this feature!");
             return;
         }
         setActiveTab(tab);
     };
 
+    // 🟢 Memoize Sorting and Grouping Logic
+    const sortedHistory = useMemo(() => {
+        return [...historyList].sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
+    }, [historyList]);
 
-    // 🟢 Sort Data (Latest First)
-    const sortedHistory = [...historyList].sort((a, b) => b.timestamp.seconds - a.timestamp.seconds);
+    // const historyByDate = useMemo(() => {
+    //     return sortedHistory.reduce((acc, entry) => {
+    //         const dateKey = new Date(entry.timestamp.seconds * 1000).toLocaleDateString();
+    //         if (!acc[dateKey]) acc[dateKey] = [];
+    //         acc[dateKey].push(entry);
+    //         return acc;
+    //     }, {});
+    // }, [sortedHistory]);
 
-    // 🟢 Grouping by Date
-    const historyByDate = sortedHistory.reduce((acc, entry) => {
-        const dateKey = new Date(entry.timestamp.seconds * 1000).toLocaleDateString();
-        if (!acc[dateKey]) acc[dateKey] = [];
-        acc[dateKey].push(entry);
-        return acc;
-    }, {});
+    // 🟢 Filter Today's History
+    // const today = useMemo(() => new Date().toLocaleDateString(), []);
+    const dailyHistory = useMemo(() => {
+        const todayFormatted = new Date().toISOString().split('T')[0]; // Get date in 'yyyy-mm-dd' format
+
+        const filtered = sortedHistory.filter(entry => {
+            const entryTimestamp = new Date(entry.timestamp); // Directly use the timestamp as milliseconds
+            const entryFormattedDate = entryTimestamp.toISOString().split('T')[0]; // Format entry date similarly
+
+            return entryFormattedDate === todayFormatted;
+        });
+
+        return filtered;
+    }, [sortedHistory]);
 
 
-    // 🟢 Daily History - Filter Only Today's Data
-    const today = new Date().toLocaleDateString(); // Aaj ki date
-    const dailyHistory = sortedHistory.filter(entry => {
-        const entryDate = new Date(entry.timestamp.seconds * 1000).toLocaleDateString();
-        return entryDate === today;
-    });
+    // 🟢 Filter Last 7 Days History
+    const sevenDaysAgo = useMemo(() => {
+        const date = new Date();
+        date.setDate(date.getDate() - 7);
+        return date;
+    }, []);
+    const weeklyHistory = useMemo(() => {
+        return sortedHistory.filter(entry => {
+
+            // Since the timestamp is in milliseconds, use it directly
+            const entryTimestamp = new Date(entry.timestamp);  // Use timestamp directly (in milliseconds)
 
 
-    // 🟢 Weekly History - Filter Last 7 Days Data
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7); // Last 7 days ka starting point
+            // Normalize entry timestamp to midnight
+            entryTimestamp.setHours(0, 0, 0, 0);
 
-    const weeklyHistory = sortedHistory.filter(entry => {
-        const entryDate = new Date(entry.timestamp.seconds * 1000);
-        return entryDate >= sevenDaysAgo; // Sirf last 7 days ki entries allow hongi
-    });
+            return entryTimestamp >= new Date(sevenDaysAgo);  // Compare dates
+        });
+    }, [sortedHistory, sevenDaysAgo]);
 
 
     return (
         <div className="history-page">
-            <div className="sidebar">
+
+            <Topbar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+
+            <div className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
                 <Sidebar />
             </div>
+
+
             <div className="history-content">
                 <h2 className="history-title">📜 Activity History</h2>
 
@@ -86,20 +119,24 @@ const History = () => {
                         {!loading && !error && dailyHistory.length === 0 && (
                             <p className="history-empty">🚀 No history available for today.</p>
                         )}
-                        {dailyHistory.map((entry) => (
-                            <div key={entry.id} className={`history-card ${entry.action.toLowerCase()}`}>
-                                <div className="history-info">
-                                    <strong className="habit-name">{entry.habitName}</strong>
-                                    <span className="history-action">{entry.action}</span>
+                        {dailyHistory.map((entry) => {
+                            // Convert timestamp directly without multiplying by 1000 (since it's in milliseconds)
+                            const timestamp = new Date(entry.timestamp);  // Assuming entry.timestamp is already in milliseconds
+
+                            return (
+                                <div key={entry.id} className={`history-card ${entry.action.toLowerCase()}`}>
+                                    <div className="history-info">
+                                        <strong className="habit-name">{entry.habitName}</strong>
+                                        <span className="history-action">{entry.action}</span>
+                                    </div>
+                                    <span className="history-time">
+                                        🕒 {timestamp.toLocaleTimeString()}
+                                    </span>
                                 </div>
-                                <span className="history-time">
-                                    🕒 {new Date(entry.timestamp.seconds * 1000).toLocaleTimeString()}
-                                </span>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </>
                 )}
-
 
                 {activeTab === "Weekly" && (
                     <>
@@ -108,32 +145,30 @@ const History = () => {
                         {!loading && !error && weeklyHistory.length === 0 && (
                             <p className="history-empty">📅 No history available for the past 7 days.</p>
                         )}
-                        {weeklyHistory.map((entry) => (
-                            <div key={entry.id} className={`history-card ${entry.action.toLowerCase()}`}>
-                                <div className="history-info">
-                                    <strong className="habit-name">{entry.habitName}</strong>
-                                    <span className="history-action">{entry.action}</span>
+                        {weeklyHistory.map((entry) => {
+                            // Convert timestamp directly without multiplying by 1000 (since it's in milliseconds)
+                            const timestamp = new Date(entry.timestamp);  // Assuming entry.timestamp is already in milliseconds
+
+                            return (
+                                <div key={entry.id} className={`history-card ${entry.action.toLowerCase()}`}>
+                                    <div className="history-info">
+                                        <strong className="habit-name">{entry.habitName}</strong>
+                                        <span className="history-action">{entry.action}</span>
+                                    </div>
+                                    <span className="history-time">
+                                        📅 {timestamp.toLocaleDateString()} 🕒 {timestamp.toLocaleTimeString()}
+                                    </span>
                                 </div>
-                                <span className="history-time">
-                                    📅 {new Date(entry.timestamp.seconds * 1000).toLocaleDateString()}
-                                    🕒 {new Date(entry.timestamp.seconds * 1000).toLocaleTimeString()}
-                                </span>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </>
                 )}
 
 
-                {activeTab === "Streakly" && (
-                    <StreaklyHistory />
-                )}
-
-                {activeTab === 'Lifetime' && (
-                    <LifetimeHistory />
-                )}
+                {activeTab === "Streakly" && <StreaklyHistory />}
+                {activeTab === "Lifetime" && <LifetimeHistory />}
             </div>
         </div>
-
     );
 };
 

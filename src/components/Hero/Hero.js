@@ -1,32 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveSlide } from '../../store/slices/HeroCarouselSlice';
-import './Hero.css';
 import HeroButtons from './HeroButtons';
 
 function Hero() {
-
   const dispatch = useDispatch();
-  const carouselData = useSelector(state => state.heroCarouselData);
+  const carouselData = useSelector((state) => state.heroCarouselData);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [transitionClass, setTransitionClass] = useState("active");
+  const [transitionClass, setTransitionClass] = useState('active');
   const [animate, setAnimate] = useState(true);
 
-
-  // Function to change slide (Automatic)
-  const changeSlide = () => {
-    setTransitionClass("exiting");
+  const changeSlide = useCallback(() => {
+    setTransitionClass('exiting');
     setAnimate(false);
     setTimeout(() => {
       const nextIndex = (currentIndex + 1) % carouselData.length;
       setCurrentIndex(nextIndex);
       dispatch(setActiveSlide(nextIndex + 1));
-      setTransitionClass("entering");
+      setTransitionClass('entering');
       setAnimate(true);
     }, 800);
-  };
+  }, [currentIndex, carouselData.length, dispatch]);
 
-  // Function to go to specific slide when button is clicked
   const goToSlide = (index) => {
     setCurrentIndex(index);
     dispatch(setActiveSlide(index + 1));
@@ -34,81 +29,75 @@ function Hero() {
 
   useEffect(() => {
     const interval = setInterval(changeSlide, 3000);
-
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, [changeSlide]);
 
   useEffect(() => {
-    setTimeout(() => setTransitionClass("active"), 50); // Smooth entry for first render
+    setTimeout(() => setTransitionClass('active'), 50);
   }, [currentIndex]);
 
+  const currentSlide = carouselData?.[currentIndex];
+
+  if (!currentSlide) return null; // Avoid crashing if no data
 
   return (
-
     <section className='hero'>
-      <div className="left">
-        <div className="illus-content">
-          <div className="content">
+      <div className='left'>
+        <div className='illus-content'>
+          <div className='content'>
             <h1 className={animate ? 'text-transition' : ''}>
-              {carouselData[currentIndex].title}
+              {currentSlide.title}
             </h1>
             <p className={animate ? 'text-transition' : ''}>
-              {carouselData[currentIndex].description}
+              {currentSlide.description}
             </p>
           </div>
 
-
-          <div className="track-dots">
+          <div className='track-dots'>
             {carouselData.map((_, index) => (
               <button
                 key={index}
-                className={`dot ${currentIndex === index ? "active" : ""}`}
-                onClick={() => {
-                  setCurrentIndex(index);
-                  dispatch(setActiveSlide(index + 1));
-                }}
+                className={`dot ${currentIndex === index ? 'active' : ''}`}
+                onClick={() => goToSlide(index)}
               />
             ))}
           </div>
 
-          {/* HeroButtons Styles => Hero.css */}
           <HeroButtons />
-
         </div>
       </div>
 
-      <div className="right">
-        <div className="concentric-circles">
-          <div className="circle zero"></div>
-          <div className="circle one"></div>
-          <div className="circle two"></div>
-          <div className="circle three"></div>
-          <div className="circle four"></div>
-          <div className="circle five"></div>
-          <div className="circle six"></div>
+      <div className='right'>
+        <div className='concentric-circles'>
+          <div className='circle zero'></div>
+          <div className='circle one'></div>
+          <div className='circle two'></div>
+          <div className='circle three'></div>
+          <div className='circle four'></div>
+          <div className='circle five'></div>
+          <div className='circle six'></div>
         </div>
 
-        <div className="mainImg">
+        <div className='mainImg'>
           <img
-            src={carouselData[currentIndex].image}
-            alt={carouselData[currentIndex].title}
+            src={currentSlide.image}
+            alt={currentSlide.title}
             className={`carousel-image ${transitionClass}`}
           />
         </div>
 
-        {carouselData[currentIndex].image2 && (
+        {currentSlide.image2 && (
           <div
-            className={`secondaryImg ${transitionClass} ${currentIndex === 2 ? "thirdCaro" : ""}`}
+            className={`secondaryImg ${transitionClass} ${
+              currentIndex === 2 ? 'thirdCaro' : ''
+            }`}
           >
-            <img src={carouselData[currentIndex].image2} alt="dots" />
+            <img src={currentSlide.image2} alt='dots' />
           </div>
-        )
-        }
+        )}
       </div>
-
     </section>
-  )
+  );
 }
 
-export default Hero
-
+export default Hero;

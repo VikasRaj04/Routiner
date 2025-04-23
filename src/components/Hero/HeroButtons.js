@@ -6,84 +6,80 @@ import { GoogleAuthProvider, signInAnonymously, signInWithPopup } from 'firebase
 import { auth } from '../../firebase/firebase';
 
 function HeroButtons() {
-    const navigate = useNavigate();
-    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-    const isGuest = useSelector((state) => state.auth.isGuest);
-    const firstVisitChecked = localStorage.getItem("firstVisitChecked");
+  const navigate = useNavigate();
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const isGuest = useSelector((state) => state.auth.isGuest);
 
+  // Page Loaded and Redirects
+  useEffect(() => {
+    const firstVisitChecked = localStorage.getItem('firstVisitChecked');
 
-    // Page Loaded and Redirects
-    useEffect(() => {
-        if (!firstVisitChecked) {
-            if (isLoggedIn || isGuest) {
-                navigate("/dashboard");
-                return;
-            }
+    if (!firstVisitChecked) {
+      if (isLoggedIn || isGuest) {
+        navigate('/dashboard');
+        return;
+      }
 
-            const isFirstVisit = localStorage.getItem("isFirstVisit");
-            if (isFirstVisit === null) {
-                localStorage.setItem("isFirstVisit", "false");
-            } else {
-                navigate("/dashboard");
-            }
-            localStorage.setItem('firstVisitChecked', 'true');
-        }
-    }, [isLoggedIn, isGuest, firstVisitChecked, navigate]);
+      const isFirstVisit = localStorage.getItem('isFirstVisit');
+      if (isFirstVisit === null) {
+        localStorage.setItem('isFirstVisit', 'false');
+      } else {
+        navigate('/dashboard');
+      }
 
-    // Login Page
-    const handleEmailLogin = () => {
-        navigate('/login')
+      localStorage.setItem('firstVisitChecked', 'true');
     }
+  }, [isLoggedIn, isGuest, navigate]);
 
-    // Google Login
-    const handleGoogleLogin = async () => {
-        const provider = new GoogleAuthProvider();
+  // Login Page
+  const handleEmailLogin = () => navigate('/login');
 
-        try {
-            await signInWithPopup(auth, provider);
-            navigate("/dashboard");
-            console.log("Google login successful");
-        } catch (err) {
-            console.error("Error with Google login:", err.message);
-        }
+  // Google Login
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Error with Google login:', err.message);
     }
+  };
 
-    // Guest Login
-    const handleGuestLogin = async () => {
-        try {
-            await signInAnonymously(auth);
-            navigate("/dashboard");
-            console.log("Logged in as guest");
-        } catch (err) {
-            console.error("Error logging in as guest:", err.message);
-        }
-    };
+  // Guest Login
+  const handleGuestLogin = async () => {
+    try {
+      await signInAnonymously(auth);
+      navigate('/dashboard');
+    } catch (err) {
+      console.error('Error logging in as guest:', err.message);
+    }
+  };
 
+  return (
+    <div>
+      <div className="btns">
+        <Button className="white-btn hero-btn-main" onClick={handleEmailLogin}>
+          <i className="fa-solid fa-arrow-right-to-bracket" /> Continue with E-mail
+        </Button>
+        <div className="social-buttons">
+          <Button className="social-btn white-btn" onClick={handleGoogleLogin}>
+            <i className="fa-brands fa-google" /> Google
+          </Button>
 
-    return (
-        <div>
-            <div className="btns">
-                <Button className={"white-btn hero-btn-main"} onClick={() => handleEmailLogin()}>
-                    <i class="fa-solid fa-arrow-right-to-bracket" /> Continue with E-mail
-                </Button>
-                <div className="social-buttons">
-                    <Button className={"social-btn white-btn"} onClick={() => handleGoogleLogin()}>
-                        <i class="fa-brands fa-google" /> Google
-                    </Button>
+          {/* <Button className="social-btn white-btn">
+            <i className="fa-brands fa-facebook" /> Facebook
+          </Button> */}
 
-                    {/* <Button className={"social-btn white-btn"}>
-                        <i class="fa-brands fa-facebook" /> Facebook
-                    </Button> */}
-
-                    <Button className={"social-btn white-btn"} onClick={() => handleGuestLogin()}>
-                        Guest
-                    </Button>
-
-                </div>
-            </div>
-            <p className='privacy-policy'>By continuing you agree Terms of Services & Privacy Policy</p>
+          <Button className="social-btn white-btn" onClick={handleGuestLogin}>
+            Guest
+          </Button>
         </div>
-    )
+      </div>
+      <p className="privacy-policy">
+        By continuing you agree Terms of Services & Privacy Policy
+      </p>
+    </div>
+  );
 }
 
-export default HeroButtons
+export default HeroButtons;

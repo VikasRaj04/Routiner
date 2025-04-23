@@ -3,7 +3,6 @@
     width: 100%;
     display: flex;
     background-color: #f4f7fc;
-    /* Light Background for Clean Look */
     min-height: 100vh;
 }
 
@@ -14,7 +13,6 @@
 .history-content {
     flex: 1;
     padding: 40px;
-    /* max-width: 900px; */
     max-width: calc(100% - 233px);
     margin: auto;
 }
@@ -28,7 +26,7 @@
     margin-bottom: 30px;
 }
 
-
+/* 🔹 Tabs */
 .history-tabs {
     display: flex;
     justify-content: center;
@@ -43,7 +41,7 @@
     cursor: pointer;
     border-radius: 8px;
     background: #f1f1f1;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease;
 }
 
 .history-tab:hover {
@@ -52,17 +50,13 @@
 
 .history-tab.active {
     background: #3843FF;
-    /* Primary Blue */
     color: white;
     font-weight: bold;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-
 /* 🔹 Status Messages */
-.history-loading,
-.history-error,
-.history-empty {
+.history-loading, .history-error, .history-empty {
     text-align: center;
     font-size: 1.3rem;
     color: #666;
@@ -101,27 +95,23 @@
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* 🔹 Hover Effect */
 .history-card:hover {
     transform: translateY(-3px);
     box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.12);
 }
 
-/* 🔹 Text Layout */
 .history-info {
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
-/* 🔹 Habit Name */
 .habit-name {
     font-size: 1.1rem;
     font-weight: 600;
     color: #222;
 }
 
-/* 🔹 Timestamp */
 .history-time {
     font-size: 1rem;
     color: #555;
@@ -137,7 +127,6 @@
     text-transform: capitalize;
 }
 
-/* 🔹 Different Colors for Actions */
 .history-card.created {
     border-left: 6px solid #28a745;
     background-color: rgba(40, 167, 69, 0.08);
@@ -155,36 +144,30 @@
     color: #dc3545;
 }
 
-
-
-
-/* Streakly */
+/* Streak Section */
 .streak-section {
     padding: 20px;
 }
 
-/* 🟢 Grid Layout - Equal Column Distribution */
 .streak-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
 }
 
-/* 📦 Box Design */
 .streak-box {
     background: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    transition: box-shadow 0.3s ease;
 }
 
 .streak-box:hover {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 🏆 Title/Header */
 .streak-header {
     font-size: 1.2rem;
     font-weight: 600;
@@ -194,14 +177,12 @@
     padding-bottom: 5px;
 }
 
-/* 📋 List Styling */
 .streak-list {
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
-/* ✅ Streak Item */
 .streak-item {
     display: flex;
     justify-content: space-between;
@@ -216,19 +197,16 @@
     background: #f0f0f0;
 }
 
-/* 🏷 Habit Name */
 .streak-name {
     font-weight: 500;
     color: #444;
 }
 
-/* 📅 Date */
 .streak-date {
     font-size: 0.9rem;
     color: #666;
 }
 
-/* ❌ No Data */
 .no-data {
     text-align: center;
     color: #999;
@@ -239,17 +217,12 @@
     border-radius: 6px;
 }
 
-
-
-
-/* LifeTime History */
-
+/* Lifetime History */
 .lifetime-history-container {
     padding: 24px;
 }
 
-.loading-text,
-.error-text {
+.loading-text, .error-text {
     font-size: 16px;
     color: #555;
     text-align: center;
@@ -262,7 +235,6 @@
     gap: 12px;
     justify-content: center;
 }
-
 
 .back-button {
     background: #3843FF;
@@ -284,7 +256,6 @@
 .history-cards-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, 300px);
-    flex-wrap: wrap;
     gap: 12px;
     justify-content: center;
 }
@@ -316,9 +287,7 @@
     color: #666;
 }
 
-
 /* Lifetime Card */
-
 .lifetime-card {
     background-color: white;
     padding: 16px;
@@ -336,4 +305,70 @@
 .lifetime-card-title {
     font-size: 18px;
     font-weight: 600;
+}
+
+
+
+@media (max-width: 1024px) {
+    .streak-grid{
+        display: flex;
+        flex-direction: column-reverse;
+    }
+}
+
+@media (max-width: 769px) {
+
+    .history-content {
+        flex: initial;
+        padding: 10px;
+        width: 100%;
+        max-width: 100%;
+        margin: 50px auto;
+    }
+
+    .history-card{
+        padding: 12px;
+    }
+    
+    .history-time{
+        font-size: 0.8rem;
+    }
+
+    .habit-name{
+        font-size: 1rem;
+    }
+
+    .history-action{
+        font-size: 0.9rem;
+    }
+
+    .history-title{
+        font-size: 2rem;
+        margin: 20px 0;
+    }
+
+    .history-tab{
+        padding: 7px 14px;
+        font-size: 0.95rem;
+        border-radius: 6px;
+    }
+
+    .streak-section{
+        width: 90%;
+        margin: auto;
+    }
+
+    .streak-item{
+        margin-bottom: 6px;
+        padding: 8px;
+    }
+
+    .streak-name{
+        font-size: 0.9rem;
+    }
+
+    .streak-date{
+        font-size: 0.75rem;
+    }
+
 }

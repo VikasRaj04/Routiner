@@ -3,7 +3,6 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../../firebase/firebase';
 import { Button, Input, Label } from '../index';
 import { Link, useNavigate } from 'react-router-dom';
-import './Auth.css';
 import { doc, setDoc } from 'firebase/firestore';
 import getFirebaseErrorMessage from '../../firebase/firebaseErrors';
 import {
@@ -125,7 +124,7 @@ function SignUp() {
   return (
     <div className="auth-container">
       <h2 className="auth-heading">Create Account</h2>
-      <form onSubmit={handleRegister}>
+      <form onSubmit={handleRegister} autoComplete='on'>
         {/* Name */}
         <div className="name">
           <Label htmlFor="name" label="Full Name:" />
@@ -134,6 +133,7 @@ function SignUp() {
             name="name"
             placeholder="Enter your Full Name"
             id="name"
+             autocomplete="name"
             value={formData.name}
             onChange={handleChange}
             required
@@ -150,6 +150,7 @@ function SignUp() {
             name="email"
             value={formData.email}
             id="email"
+            autocomplete="email" 
             onChange={handleChange}
             required
           />
@@ -165,6 +166,7 @@ function SignUp() {
             value={formData.password}
             name="password"
             id="password"
+             autocomplete="new-password"
             onChange={handleChange}
             required
           />
@@ -180,6 +182,7 @@ function SignUp() {
             value={formData.confirmPassword}
             name="confirmPassword"
             id="confirm-password"
+            autocomplete="new-password"
             onChange={handleChange}
             required
           />
@@ -194,8 +197,9 @@ function SignUp() {
           <Input
             type="date"
             name="birth"
-            value={formData.birth}
             id="dob"
+            autocomplete='bday'
+            value={formData.birth}
             onChange={handleChange}
             required
           />
