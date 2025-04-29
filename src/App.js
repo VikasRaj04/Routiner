@@ -18,6 +18,7 @@ const Profile = lazy(() => import("./pages/Profile"));
 const Progress = lazy(() => import("./pages/Progress"));
 const History = lazy(() => import("./pages/History"));
 const Calendar = lazy(() => import("./pages/Calendar"));
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy"));
 
 function App() {
   const dispatch = useDispatch();
@@ -53,11 +54,13 @@ function App() {
     const preLoadProgress = () => import("./pages/Progress");
     const preLoadHistory = () => import("./pages/History");
     const preLoadCalendar = () => import("./pages/Calendar");
+    const preLoadPrivacyPolicy = () => import("./pages/PrivacyPolicy");
 
     preLoadDashboard();
     preLoadProgress();
     preLoadHistory();
     preLoadCalendar();
+    preLoadPrivacyPolicy();
   }, []);
 
   if (loading) return <Loader />;
@@ -75,6 +78,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

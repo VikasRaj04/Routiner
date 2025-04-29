@@ -31,6 +31,7 @@ const Footer = () => {
               <li><a href="/">Home</a></li>
               <li><a href="/dashboard">Dashboard</a></li>
               <li><a href="#about">About</a></li>
+              <li><a href="/privacy-policy">Privacy & Policy</a></li>
               {/* <li><a href="#" onClick={() => generateUserReport(user.uid)}>Reports</a></li> */}
               {/* <li><a href="/contact">Contact Us</a></li> */}
             </ul>
@@ -41,12 +42,45 @@ const Footer = () => {
       <div className="footer-bottom">
         <p>© 2025 Routiner. All rights reserved.</p>
         <div className="social-icons">
-          <span className="icon"><i className="fab fa-facebook-f"></i></span>
-          <span className="icon"><i className="fab fa-twitter"></i></span>
-          <span className="icon"><i className="fab fa-instagram"></i></span>
-          <span className="icon"><i className="fab fa-linkedin-in"></i></span>
+          <span className="icon">
+            <a
+              href="https://www.facebook.com/profile.php?id=100041961218628"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i className="fab fa-facebook-f"></i>
+            </a>
+          </span>
+          <span className="icon">
+            <a
+              href="https://www.x.com/vikasraj04"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i className="fab fa-twitter"></i>
+            </a>
+          </span>
+          <span className="icon">
+            <a
+              href="https://www.instagram.com/vikas_raj_alone?igsh=MTF5bDBsdmV6amVrbQ=="
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i className="fab fa-instagram"></i>
+            </a>
+          </span>
+          <span className="icon">
+            <a
+              href="https://www.linkedin.com/in/vikasraj04?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <i className="fab fa-linkedin-in"></i>
+            </a>
+          </span>
         </div>
       </div>
+
     </footer>
   );
 };
