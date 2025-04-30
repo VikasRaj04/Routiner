@@ -1,3 +1,11 @@
-# https://www.robotstxt.org/robotstxt.html
+# Allow all user-agents to access all content
 User-agent: *
-Disallow:
+Disallow: /admin/
+Disallow: /login/
+Disallow: /signup/
+
+# Allow search engines to index everything else
+Allow: /
+
+# Sitemap location for search engines
+Sitemap: https://www.routiner.codesangle.com/sitemap.xml
