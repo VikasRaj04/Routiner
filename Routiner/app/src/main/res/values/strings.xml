@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Routiner</string>
+    <string name="title_activity_main">Routiner</string>
+    <string name="package_name">com.sukettech.routiner</string>
+    <string name="custom_url_scheme">com.sukettech.routiner</string>
+</resources>

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "667287178637",
+    "project_id": "routiner-ce566",
+    "storage_bucket": "routiner-ce566.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:667287178637:android:ab4da86e943ad19c1c81c4",
+        "android_client_info": {
+          "package_name": "com.sukettech.routiner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "667287178637-nmpu3ecjsk717ccfhlo6irkg5apm6hlv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQJEI5YEeHjwbI0mZsoGmQV4nHDtXeCaM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "667287178637-nmpu3ecjsk717ccfhlo6irkg5apm6hlv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
