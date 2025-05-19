@@ -14,19 +14,7 @@ const PrivacyPolicy = () => {
           At Routiner, accessible from routiner.codesangle.com, we respect your privacy and are committed to protecting any personal information you may provide through the App. This Privacy Policy document outlines the types of information that is collected, how it is used, and the rights you have regarding your data.
         </p>
 
-        <div className="ad">
-          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405064387458435"
-            crossorigin="anonymous"></script>
-          <ins class="adsbygoogle"
-            style={{ display: 'block' }}
-            data-ad-format="fluid"
-            data-ad-layout-key="-ef+6k-30-ac+ty"
-            data-ad-client="ca-pub-3405064387458435"
-            data-ad-slot="5877457995"></ins>
-          <script>
-            (adsbygoogle = window.adsbygoogle || []).push({ });
-          </script>
-        </div>
+
 
         <h2 className="section-title">Information We Collect</h2>
         <p className="section-content">
@@ -50,19 +38,7 @@ const PrivacyPolicy = () => {
           <li>To send you notifications and updates regarding the App’s features, improvements, or service-related matters.</li>
         </ul>
 
-        <div className="ad">
-          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405064387458435"
-            crossorigin="anonymous"></script>
-          <ins class="adsbygoogle"
-            style={{ display: 'block' }}
-            data-ad-format="fluid"
-            data-ad-layout-key="-ef+6k-30-ac+ty"
-            data-ad-client="ca-pub-3405064387458435"
-            data-ad-slot="5877457995"></ins>
-          <script>
-            (adsbygoogle = window.adsbygoogle || []).push({ });
-          </script>
-        </div>
+       
 
         <h2 className="section-title">Third-Party Services</h2>
         <p className="section-content">
@@ -83,19 +59,7 @@ const PrivacyPolicy = () => {
           As a user, you have the right to access, update, or delete the personal data we hold about you. You may also withdraw your consent for us to process your personal data at any time. To exercise your rights, please contact us at the details provided below.
         </p>
 
-        <div className="ad">
-          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405064387458435"
-            crossorigin="anonymous"></script>
-          <ins class="adsbygoogle"
-            style={{ display: 'block' }}
-            data-ad-format="fluid"
-            data-ad-layout-key="-ef+6k-30-ac+ty"
-            data-ad-client="ca-pub-3405064387458435"
-            data-ad-slot="5877457995"></ins>
-          <script>
-            (adsbygoogle = window.adsbygoogle || []).push({ });
-          </script>
-        </div>
+
 
         <h2 className="section-title">Data Retention</h2>
         <p className="section-content">
@@ -119,19 +83,7 @@ const PrivacyPolicy = () => {
       </div>
 
 
-      <div className="ad">
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405064387458435"
-          crossorigin="anonymous"></script>
-        <ins class="adsbygoogle"
-          style={{ display: 'block' }}
-          data-ad-format="fluid"
-          data-ad-layout-key="-ef+6k-30-ac+ty"
-          data-ad-client="ca-pub-3405064387458435"
-          data-ad-slot="5877457995"></ins>
-        <script>
-          (adsbygoogle = window.adsbygoogle || []).push({ });
-        </script>
-      </div>
+
 
       <Footer />
     </>
