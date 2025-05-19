@@ -45,7 +45,7 @@ const Calendar = () => {
           <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405064387458435"
             crossorigin="anonymous"></script>
           <ins class="adsbygoogle"
-            style="display:block"
+            style={{ display: 'block' }}
             data-ad-format="fluid"
             data-ad-layout-key="-ef+6k-30-ac+ty"
             data-ad-client="ca-pub-3405064387458435"
@@ -61,7 +61,7 @@ const Calendar = () => {
           <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3405064387458435"
             crossorigin="anonymous"></script>
           <ins class="adsbygoogle"
-            style="display:block"
+            style={{ display: 'block' }}
             data-ad-format="fluid"
             data-ad-layout-key="-ef+6k-30-ac+ty"
             data-ad-client="ca-pub-3405064387458435"
